@@ -1,5 +1,5 @@
-# AgenTD
-# TD自动化项目实施与AI操作指南（基于当前代码状态）
+# AgenTD(Alpha)-基于多智能体协作的TouchDesigner项目AI团队
+# 让AI接手你的TouchDesigner项目！
 
 ## 1. 文档目标与边界
 
