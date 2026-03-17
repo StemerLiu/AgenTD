@@ -1,0 +1,10 @@
+{
+  "nodes": [
+    { "parent": "/project1", "type": "constantCHOP", "name": "const1", "params": { "value0": 0.5 } },
+    { "parent": "/project1", "type": "noiseCHOP", "name": "noise1", "params": { "amplitude": 1.0 } },
+    { "parent": "/project1", "type": "mergeCHOP", "name": "merge1" }
+  ],
+  "wires": [
+    { "dest": "/project1/merge1", "src": ["/project1/const1", "/project1/noise1"] }
+  ]
+}

@@ -1,0 +1,2340 @@
+﻿[
+	{
+		"Delay_2_": {
+			"relPath": "/project1/Delay_2_",
+			"type": "baseCOMP",
+			"pos": {
+				"x": 257,
+				"y": 769
+			},
+			"parameters": {
+				"Common": {
+					"clone": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"enablecloning": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"enablecloningpulse": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"enableexternaltox": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					},
+					"enableexternaltoxpulse": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"externaltox": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"iop": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"iop0op": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"iop0shortcut": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"loadondemand": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					},
+					"opshortcut": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"opviewer": {
+						"val": "./merge1",
+						"mode": "ParMode.CONSTANT"
+					},
+					"parentshortcut": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"reloadbuiltin": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"reloadcustom": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"relpath": {
+						"val": "inherit",
+						"mode": "ParMode.CONSTANT"
+					},
+					"savebackup": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"subcompname": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"Extensions": {
+					"ext": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ext0name": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ext0object": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ext0promote": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					},
+					"reinitextensions": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"关于": {
+					"Description": {
+						"val": "高级延时处理",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Developer": {
+						"val": "刘翔东",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Inputcontent": {
+						"val": " ",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Outputcontent": {
+						"val": "连续两次触发检测bool、pulse；自动延迟触发过程、bool、pulse",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Touchdesignerversion": {
+						"val": "2023.116",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Toxversion": {
+						"val": "2",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"属性": {
+					"Delay": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Header": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Header2": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Header3": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"P1": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"P2": {
+						"val": "",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Pulse": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Pulse2": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Sl1": {
+						"val": "op('text1').text = 'hello'",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Sl2": {
+						"val": "op('text1').text = 'bye'",
+						"mode": "ParMode.CONSTANT"
+					},
+					"Toggle": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					}
+				}
+			},
+			"customParameters": {
+				"属性": {
+					"Header3": {
+						"val": "",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Header3",
+							"label": "延迟时间",
+							"style": "Header",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": true,
+							"help": "",
+							"default": "",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Delay": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Delay",
+							"label": "延时(s)",
+							"style": "Float",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": false,
+							"help": "",
+							"default": 1.0,
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 10.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Header2": {
+						"val": "",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Header2",
+							"label": "自动延迟触发",
+							"style": "Header",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": true,
+							"help": "",
+							"default": "",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Pulse": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Pulse",
+							"label": "开始",
+							"style": "Pulse",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": false,
+							"help": "",
+							"default": false,
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Pulse2": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Pulse2",
+							"label": "取消",
+							"style": "Pulse",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": false,
+							"help": "",
+							"default": false,
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"P2": {
+						"val": "",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "P2",
+							"label": "触发行为",
+							"style": "Str",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": false,
+							"help": "",
+							"default": "",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Sl1": {
+						"val": "op('text1').text = 'hello'",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Sl1",
+							"label": "示例",
+							"style": "Str",
+							"page": "属性",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "op('text1').text = 'hello'",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Header": {
+						"val": "",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Header",
+							"label": "检测两次连续触发（0-1-0）",
+							"style": "Header",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": true,
+							"help": "",
+							"default": "",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Toggle": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Toggle",
+							"label": "触发",
+							"style": "Toggle",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": false,
+							"help": "",
+							"default": false,
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false,
+							"menuNames": [
+								"off",
+								"on"
+							],
+							"menuLabels": [
+								"Off",
+								"On"
+							]
+						}
+					},
+					"P1": {
+						"val": "",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "P1",
+							"label": "触发行为",
+							"style": "Str",
+							"page": "属性",
+							"enable": true,
+							"readOnly": false,
+							"startSection": false,
+							"help": "",
+							"default": "",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Sl2": {
+						"val": "op('text1').text = 'bye'",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Sl2",
+							"label": "示例",
+							"style": "Str",
+							"page": "属性",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "op('text1').text = 'bye'",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					}
+				},
+				"关于": {
+					"Inputcontent": {
+						"val": " ",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Inputcontent",
+							"label": "输入",
+							"style": "Str",
+							"page": "关于",
+							"enable": true,
+							"readOnly": true,
+							"startSection": true,
+							"help": "",
+							"default": "",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Outputcontent": {
+						"val": "连续两次触发检测bool、pulse；自动延迟触发过程、bool、pulse",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Outputcontent",
+							"label": "输出",
+							"style": "Str",
+							"page": "关于",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "连续两次触发检测bool、pulse；自动延迟触发过程、bool、pulse",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Description": {
+						"val": "高级延时处理",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Description",
+							"label": "说明",
+							"style": "Str",
+							"page": "关于",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "高级延时处理",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Developer": {
+						"val": "刘翔东",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Developer",
+							"label": "作者",
+							"style": "Str",
+							"page": "关于",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "刘翔东",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Touchdesignerversion": {
+						"val": "2023.116",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Touchdesignerversion",
+							"label": "TouchDesigner版本",
+							"style": "Str",
+							"page": "关于",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "2023.116",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					},
+					"Toxversion": {
+						"val": "2",
+						"mode": "ParMode.CONSTANT",
+						"definition": {
+							"name": "Toxversion",
+							"label": "TOX版本",
+							"style": "Str",
+							"page": "关于",
+							"enable": true,
+							"readOnly": true,
+							"startSection": false,
+							"help": "",
+							"default": "2",
+							"min": 0.0,
+							"max": 1.0,
+							"normMin": 0.0,
+							"normMax": 1.0,
+							"clampMin": false,
+							"clampMax": false,
+							"isMomentary": false,
+							"isMenu": false
+						}
+					}
+				}
+			},
+			"drawState": {
+				"display": false,
+				"render": false,
+				"pickable": false
+			},
+			"children": [
+				{
+					"chopexec1": {
+						"relPath": "/project1/Delay_2_/chopexec1",
+						"type": "chopexecuteDAT",
+						"pos": {
+							"x": -200,
+							"y": 275
+						},
+						"parameters": {
+							"CHOP Execute": {
+								"active": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"channel": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"chop": {
+									"val": "par1",
+									"mode": "ParMode.CONSTANT"
+								},
+								"edit": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"executeloc": {
+									"val": "here",
+									"mode": "ParMode.CONSTANT"
+								},
+								"freq": {
+									"val": "everysample",
+									"mode": "ParMode.CONSTANT"
+								},
+								"fromop": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"offtoon": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ontooff": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"valuechange": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"whileoff": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"whileon": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Common": {
+								"customext": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extension": {
+									"val": "languageext",
+									"mode": "ParMode.CONSTANT"
+								},
+								"language": {
+									"val": "python",
+									"mode": "ParMode.CONSTANT"
+								},
+								"wordwrap": {
+									"val": "input",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"File": {
+								"defaultreadencoding": {
+									"val": "autodetect",
+									"mode": "ParMode.CONSTANT"
+								},
+								"file": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstart": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstartpulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"syncfile": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"write": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"writepulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"datContent": {
+							"kind": "text",
+							"meta": {
+								"lines": 8,
+								"chars": 334,
+								"sha1": "6b41fb8e034bea0a221b4a81446650b179ccb480"
+							},
+							"full": "def onOffToOn(channel, sampleIndex, val, prev):\n\top('constant1').par.const0value = absTime.seconds\n\top('constant2').par.const0value = 1\n\ndef onOnToOff(channel, sampleIndex, val, prev):\n\tif absTime.seconds - op('constant1').par.const0value < parent().par.Delay:\n\t\top('constant2').par.const0value = 0\n\t\top('lfo1').par.resetpulse.pulse()"
+						}
+					}
+				},
+				{
+					"chopexec2": {
+						"relPath": "/project1/Delay_2_/chopexec2",
+						"type": "chopexecuteDAT",
+						"pos": {
+							"x": 100,
+							"y": 175
+						},
+						"parameters": {
+							"CHOP Execute": {
+								"active": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"channel": {
+									"val": "pulse",
+									"mode": "ParMode.CONSTANT"
+								},
+								"chop": {
+									"val": "constant2",
+									"mode": "ParMode.CONSTANT"
+								},
+								"edit": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"executeloc": {
+									"val": "here",
+									"mode": "ParMode.CONSTANT"
+								},
+								"freq": {
+									"val": "everysample",
+									"mode": "ParMode.CONSTANT"
+								},
+								"fromop": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"offtoon": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ontooff": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"valuechange": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"whileoff": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"whileon": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Common": {
+								"customext": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extension": {
+									"val": "languageext",
+									"mode": "ParMode.CONSTANT"
+								},
+								"language": {
+									"val": "python",
+									"mode": "ParMode.CONSTANT"
+								},
+								"wordwrap": {
+									"val": "input",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"File": {
+								"defaultreadencoding": {
+									"val": "autodetect",
+									"mode": "ParMode.CONSTANT"
+								},
+								"file": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstart": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstartpulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"syncfile": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"write": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"writepulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"datContent": {
+							"kind": "text",
+							"meta": {
+								"lines": 4,
+								"chars": 116,
+								"sha1": "51cb5623426612727d7b07d050a500b861defdd0"
+							},
+							"full": "def onOffToOn(channel, sampleIndex, val, prev):\n\tif parent().par.P1:\n\t\texec('parent(2).'+str(parent().par.P1))\n\tpass"
+						}
+					}
+				},
+				{
+					"chopexec3": {
+						"relPath": "/project1/Delay_2_/chopexec3",
+						"type": "chopexecuteDAT",
+						"pos": {
+							"x": 100,
+							"y": -100
+						},
+						"parameters": {
+							"CHOP Execute": {
+								"active": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"channel": {
+									"val": "pulse",
+									"mode": "ParMode.CONSTANT"
+								},
+								"chop": {
+									"val": "constant3",
+									"mode": "ParMode.CONSTANT"
+								},
+								"edit": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"executeloc": {
+									"val": "here",
+									"mode": "ParMode.CONSTANT"
+								},
+								"freq": {
+									"val": "everysample",
+									"mode": "ParMode.CONSTANT"
+								},
+								"fromop": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"offtoon": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ontooff": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"valuechange": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"whileoff": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"whileon": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Common": {
+								"customext": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extension": {
+									"val": "languageext",
+									"mode": "ParMode.CONSTANT"
+								},
+								"language": {
+									"val": "python",
+									"mode": "ParMode.CONSTANT"
+								},
+								"wordwrap": {
+									"val": "input",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"File": {
+								"defaultreadencoding": {
+									"val": "autodetect",
+									"mode": "ParMode.CONSTANT"
+								},
+								"file": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstart": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstartpulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"syncfile": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"write": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"writepulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"datContent": {
+							"kind": "text",
+							"meta": {
+								"lines": 4,
+								"chars": 116,
+								"sha1": "e0b281443807f77b85990099240441a4b2ba65cd"
+							},
+							"full": "def onOffToOn(channel, sampleIndex, val, prev):\n\tif parent().par.P2:\n\t\texec('parent(2).'+str(parent().par.P2))\n\tpass"
+						}
+					}
+				},
+				{
+					"constant1": {
+						"relPath": "/project1/Delay_2_/constant1",
+						"type": "constantCHOP",
+						"pos": {
+							"x": -200,
+							"y": 375
+						},
+						"parameters": {
+							"Channel": {
+								"defval": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"end": {
+									"val": "10.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"endunit": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"left": {
+									"val": "hold",
+									"mode": "ParMode.CONSTANT"
+								},
+								"rate": {
+									"val": "60.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.time.rate"
+								},
+								"right": {
+									"val": "hold",
+									"mode": "ParMode.CONSTANT"
+								},
+								"single": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"start": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"startunit": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Constant": {
+								"const": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const0name": {
+									"val": "chan1",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const0value": {
+									"val": "3469.87",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Snap": {
+								"current": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"first": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"snap": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"constant2": {
+						"relPath": "/project1/Delay_2_/constant2",
+						"type": "constantCHOP",
+						"pos": {
+							"x": 100,
+							"y": 275
+						},
+						"parameters": {
+							"Channel": {
+								"defval": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"end": {
+									"val": "10.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"endunit": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"left": {
+									"val": "hold",
+									"mode": "ParMode.CONSTANT"
+								},
+								"rate": {
+									"val": "60.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.time.rate"
+								},
+								"right": {
+									"val": "hold",
+									"mode": "ParMode.CONSTANT"
+								},
+								"single": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"start": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"startunit": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Constant": {
+								"const": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const0name": {
+									"val": "bool",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const0value": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const1name": {
+									"val": "pulse",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const1value": {
+									"val": "0.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('lfo1')['chan1']"
+								}
+							},
+							"Snap": {
+								"current": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"first": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"snap": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"connections": {
+							"outputs": [
+								{
+									"port": 0,
+									"links": [
+										"merge1"
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"constant3": {
+						"relPath": "/project1/Delay_2_/constant3",
+						"type": "constantCHOP",
+						"pos": {
+							"x": 100,
+							"y": 0
+						},
+						"parameters": {
+							"Channel": {
+								"defval": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"end": {
+									"val": "10.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"endunit": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"left": {
+									"val": "hold",
+									"mode": "ParMode.CONSTANT"
+								},
+								"rate": {
+									"val": "60.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.time.rate"
+								},
+								"right": {
+									"val": "hold",
+									"mode": "ParMode.CONSTANT"
+								},
+								"single": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"start": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"startunit": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Constant": {
+								"const": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const0name": {
+									"val": "process",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const0value": {
+									"val": "0.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('timer1')['timer_fraction']"
+								},
+								"const1name": {
+									"val": "bool",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const1value": {
+									"val": "0.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('timer1')['done']"
+								},
+								"const2name": {
+									"val": "pulse",
+									"mode": "ParMode.CONSTANT"
+								},
+								"const2value": {
+									"val": "0.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('lfo2')['chan1']"
+								}
+							},
+							"Snap": {
+								"current": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"first": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"snap": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"connections": {
+							"outputs": [
+								{
+									"port": 0,
+									"links": [
+										"merge1"
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"lfo1": {
+						"relPath": "/project1/Delay_2_/lfo1",
+						"type": "lfoCHOP",
+						"pos": {
+							"x": -50,
+							"y": 275
+						},
+						"parameters": {
+							"Channel": {
+								"channelname": {
+									"val": "chan1",
+									"mode": "ParMode.CONSTANT"
+								},
+								"rate": {
+									"val": "60.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.time.rate"
+								}
+							},
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"LFO": {
+								"amp": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"bias": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"frequency": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"offset": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"phase": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"play": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"reset": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"resetcondition": {
+									"val": "offtoon",
+									"mode": "ParMode.CONSTANT"
+								},
+								"resetpulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"wavetype": {
+									"val": "pulse",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"lfo2": {
+						"relPath": "/project1/Delay_2_/lfo2",
+						"type": "lfoCHOP",
+						"pos": {
+							"x": -200,
+							"y": -125
+						},
+						"parameters": {
+							"Channel": {
+								"channelname": {
+									"val": "chan1",
+									"mode": "ParMode.CONSTANT"
+								},
+								"rate": {
+									"val": "60.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.time.rate"
+								}
+							},
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"LFO": {
+								"amp": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"bias": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"frequency": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"offset": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"phase": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"play": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"reset": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"resetcondition": {
+									"val": "offtoon",
+									"mode": "ParMode.CONSTANT"
+								},
+								"resetpulse": {
+									"val": "0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('timer1')['done']"
+								},
+								"wavetype": {
+									"val": "pulse",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"merge1": {
+						"relPath": "/project1/Delay_2_/merge1",
+						"type": "mergeCHOP",
+						"pos": {
+							"x": 300,
+							"y": 275
+						},
+						"parameters": {
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Merge": {
+								"align": {
+									"val": "auto",
+									"mode": "ParMode.CONSTANT"
+								},
+								"duplicate": {
+									"val": "unique",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"connections": {
+							"inputs": [
+								{
+									"port": 0,
+									"links": [
+										"constant3"
+									]
+								},
+								{
+									"port": 1,
+									"links": [
+										"constant2"
+									]
+								}
+							],
+							"outputs": [
+								{
+									"port": 0,
+									"links": [
+										"out1"
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"out1": {
+						"relPath": "/project1/Delay_2_/out1",
+						"type": "outCHOP",
+						"pos": {
+							"x": 500,
+							"y": 275
+						},
+						"parameters": {
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Out": {
+								"connectorder": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"label": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.name"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"connections": {
+							"inputs": [
+								{
+									"port": 0,
+									"links": [
+										"merge1"
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"par1": {
+						"relPath": "/project1/Delay_2_/par1",
+						"type": "parameterCHOP",
+						"pos": {
+							"x": -350,
+							"y": 275
+						},
+						"parameters": {
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Parameter": {
+								"builtin": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"custom": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"nameformat": {
+									"val": "parameter",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ops": {
+									"val": "..",
+									"mode": "ParMode.CONSTANT"
+								},
+								"parameters": {
+									"val": "Toggle",
+									"mode": "ParMode.CONSTANT"
+								},
+								"pargroups": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"renamefrom": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"renameto": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"sortmethod": {
+									"val": "parameter",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"par2": {
+						"relPath": "/project1/Delay_2_/par2",
+						"type": "parameterCHOP",
+						"pos": {
+							"x": -350,
+							"y": 0
+						},
+						"parameters": {
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Parameter": {
+								"builtin": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"custom": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"nameformat": {
+									"val": "parameter",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ops": {
+									"val": "..",
+									"mode": "ParMode.CONSTANT"
+								},
+								"parameters": {
+									"val": "Pulse Pulse2",
+									"mode": "ParMode.CONSTANT"
+								},
+								"pargroups": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"renamefrom": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"renameto": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"sortmethod": {
+									"val": "parameter",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"par3": {
+						"relPath": "/project1/Delay_2_/par3",
+						"type": "parameterCHOP",
+						"pos": {
+							"x": -200,
+							"y": 100
+						},
+						"parameters": {
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datindex",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Parameter": {
+								"builtin": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"custom": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"nameformat": {
+									"val": "parameter",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ops": {
+									"val": "..",
+									"mode": "ParMode.CONSTANT"
+								},
+								"parameters": {
+									"val": "Delay",
+									"mode": "ParMode.CONSTANT"
+								},
+								"pargroups": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"renamefrom": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"renameto": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"sortmethod": {
+									"val": "parameter",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"timer1": {
+						"relPath": "/project1/Delay_2_/timer1",
+						"type": "timerCHOP",
+						"pos": {
+							"x": -200,
+							"y": 0
+						},
+						"parameters": {
+							"Common": {
+								"autoexportroot": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "parent()"
+								},
+								"exportmethod": {
+									"val": "datname",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exporttable": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"scope": {
+									"val": "*",
+									"mode": "ParMode.CONSTANT"
+								},
+								"srselect": {
+									"val": "max",
+									"mode": "ParMode.CONSTANT"
+								},
+								"timeslice": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"External": {
+								"extchannel": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extchop": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extinitoff": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extstartoff": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exttcop": {
+									"val": "",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "tdu.Timecode()"
+								},
+								"extunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"rate": {
+									"val": "60.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "me.time.rate"
+								}
+							},
+							"Outputs": {
+								"outcumulativecount": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outcycle": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outcycleplusfraction": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outcyclepulse": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outdelaycount": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outdelayfraction": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outdone": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outdonepulse": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outfraction": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outinit": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outlength": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outmastercount": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outplayingcount": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outready": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outreadypulse": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outrunning": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outrunningcount": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outseg": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outsegplusfraction": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outsegpulse": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outtimeractive": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outtimercount": {
+									"val": "off",
+									"mode": "ParMode.CONSTANT"
+								},
+								"outtimerpulse": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Segments": {
+								"channelcolumns": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"gotonextseg": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"gotoprevseg": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"infocolumns": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"interpolation": {
+									"val": "steptovalue",
+									"mode": "ParMode.CONSTANT"
+								},
+								"segdat": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"segmethod": {
+									"val": "serial",
+									"mode": "ParMode.CONSTANT"
+								},
+								"segsendtime": {
+									"val": "dat",
+									"mode": "ParMode.CONSTANT"
+								},
+								"segunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Sub Range": {
+								"subend": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"subendaction": {
+									"val": "loop",
+									"mode": "ParMode.CONSTANT"
+								},
+								"subendunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"subrange": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"substart": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"substartunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"Timer": {
+								"active": {
+									"val": "running",
+									"mode": "ParMode.CONSTANT"
+								},
+								"callbacks": {
+									"val": "timer1_callbacks",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cue": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cuepoint": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cuepulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cueunits": {
+									"val": "fraction",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cycle": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cycleendalert": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"cyclelimit": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"deferpars": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"delay": {
+									"val": "0.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"delayunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"exitendcycle": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"gotodone": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"gotoendcycle": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"initialize": {
+									"val": "0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('par2')['Pulse2']"
+								},
+								"length": {
+									"val": "10.0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('par3')['Delay']"
+								},
+								"lengthtype": {
+									"val": "fixed",
+									"mode": "ParMode.CONSTANT"
+								},
+								"lengthunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"maxcycles": {
+									"val": "4",
+									"mode": "ParMode.CONSTANT"
+								},
+								"notifyunits": {
+									"val": "seconds",
+									"mode": "ParMode.CONSTANT"
+								},
+								"ondone": {
+									"val": "donothing",
+									"mode": "ParMode.CONSTANT"
+								},
+								"play": {
+									"val": "True",
+									"mode": "ParMode.CONSTANT"
+								},
+								"speed": {
+									"val": "1.0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"start": {
+									"val": "0",
+									"mode": "ParMode.EXPRESSION",
+									"expr": "op('par2')['Pulse']"
+								},
+								"timecontrol": {
+									"val": "sequential",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						}
+					}
+				},
+				{
+					"timer1_callbacks": {
+						"relPath": "/project1/Delay_2_/timer1_callbacks",
+						"type": "textDAT",
+						"pos": {
+							"x": -200,
+							"y": -125
+						},
+						"parameters": {
+							"Common": {
+								"customext": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"extension": {
+									"val": "languageext",
+									"mode": "ParMode.CONSTANT"
+								},
+								"language": {
+									"val": "python",
+									"mode": "ParMode.CONSTANT"
+								},
+								"wordwrap": {
+									"val": "input",
+									"mode": "ParMode.CONSTANT"
+								}
+							},
+							"File": {
+								"defaultreadencoding": {
+									"val": "autodetect",
+									"mode": "ParMode.CONSTANT"
+								},
+								"edit": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"file": {
+									"val": "",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstart": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"loadonstartpulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								},
+								"syncfile": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"write": {
+									"val": "False",
+									"mode": "ParMode.CONSTANT"
+								},
+								"writepulse": {
+									"val": "0",
+									"mode": "ParMode.CONSTANT"
+								}
+							}
+						},
+						"drawState": {
+							"display": false,
+							"render": false
+						},
+						"datContent": {
+							"kind": "text",
+							"meta": {
+								"lines": 72,
+								"chars": 1971,
+								"sha1": "54c9bdd6624d30dd50fdc365cd7bc8a8ea6c8b1a"
+							},
+							"full": "# me - this DAT\n# timerOp - the connected Timer CHOP\n# cycle - the cycle index\n# interrupt - True if the user initiated a premature\n#                     False if a result of a normal timeout\n# fraction - the time in 0-1 fractional form\n#\n# segment - an object describing the segment:\n#\n#    can be automatically cast to its index: e.g.:  segment+3, segment==2, etc      \n#    \n#  members of segment object:\n#      index     numeric order of the segment, from 0\n#      owner    Timer CHOP it belongs to\n#\n#      lengthSeconds, lengthSamples, lengthFrames\n#      delaySeconds, delaySamples, delayFrames\n#      beginSeconds, beginSamples, beginFrames\n#      speed\n#      cycle, cycleLimit, maxCycles\n#      cycleEndAlertSeconds, cycleEndAlertSamples, cycleEndAlertFrames\n#\n#      row - one validly named member per column:\n#            column headings used to override parameters:\n#                          length, delay, speed, cyclelimit, maxcycles, cycleendalert\n#            special column headings:\n#                          begin (time at which to start, independent of delays/lengths, overrides delay)\n#\n#    custom - dictionary of all columns that don't map to a built-in feature\n#\n\n# onInitialize(): if return value > 0, it will be\n# called again after the returned number of frames.\n# callCount increments with each attempt, starting at 1\n\ndef onInitialize(timerOp, callCount):\n\treturn 0\n\ndef onReady(timerOp):\n\treturn\n\t\ndef onStart(timerOp):\n\treturn\n\t\ndef onTimerPulse(timerOp, segment):\n\treturn\n\ndef whileTimerActive(timerOp, segment, cycle, fraction):\n\treturn\n\ndef onSegmentEnter(timerOp, segment, interrupt):\n\treturn\n\t\ndef onSegmentExit(timerOp, segment, interrupt):\n\treturn\n\ndef onCycleStart(timerOp, segment, cycle):\n\treturn\n\ndef onCycleEndAlert(timerOp, segment, cycle, alertSegment, alertDone, interrupt):\n\treturn\n\t\ndef onCycle(timerOp, segment, cycle):\n\treturn\n\ndef onDone(timerOp, segment, interrupt):\n\treturn\n\ndef onSubrangeStart(timerOp):\n\treturn\n\n\t"
+						}
+					}
+				}
+			]
+		}
+	}
+]

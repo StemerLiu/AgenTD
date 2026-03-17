@@ -1,0 +1,219 @@
+:root {
+	color-scheme: dark;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: #0b1020;
+	color: #eaf0ff;
+}
+
+.app-shell {
+	display: grid;
+	grid-template-columns: 360px 1fr;
+	gap: 12px;
+	padding: 12px;
+	height: calc(100vh - 220px);
+}
+
+.left-panel,
+.chat-panel,
+.tester {
+	background: #121a2e;
+	border: 1px solid #26314f;
+	border-radius: 12px;
+}
+
+.left-panel {
+	padding: 14px;
+	overflow: auto;
+}
+
+h1 {
+	font-size: 18px;
+	margin: 0 0 12px 0;
+}
+
+h2 {
+	font-size: 14px;
+	margin: 0 0 8px 0;
+}
+
+.section {
+	border-top: 1px solid #273459;
+	padding-top: 12px;
+	margin-top: 12px;
+}
+
+label {
+	display: block;
+	font-size: 12px;
+	margin: 6px 0 4px;
+	color: #9eb2df;
+}
+
+input,
+select,
+textarea,
+button {
+	width: 100%;
+	border-radius: 8px;
+	border: 1px solid #3a4a73;
+	background: #0f1730;
+	color: #f2f6ff;
+	padding: 9px 10px;
+	font-size: 13px;
+}
+
+textarea {
+	resize: vertical;
+}
+
+button {
+	cursor: pointer;
+	background: #2d5bff;
+	border-color: #2d5bff;
+	font-weight: 600;
+}
+
+button.secondary {
+	background: #1a2547;
+	border-color: #385098;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 2px solid #7da2ff;
+	outline-offset: 1px;
+}
+
+.row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.status {
+	min-height: 18px;
+	font-size: 12px;
+	margin-top: 8px;
+	color: #b8caef;
+}
+
+.chat-panel {
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+}
+
+.chat-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	border-bottom: 1px solid #26314f;
+}
+
+.actions {
+	display: flex;
+	gap: 8px;
+}
+
+.actions button {
+	width: auto;
+}
+
+.messages {
+	padding: 12px;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.msg {
+	max-width: 84%;
+	padding: 10px 12px;
+	border-radius: 12px;
+	white-space: pre-wrap;
+	line-height: 1.4;
+}
+
+.msg.user {
+	align-self: flex-end;
+	background: #2a57f0;
+}
+
+.msg.ai {
+	align-self: flex-start;
+	background: #1b2748;
+}
+
+.msg.agent {
+	align-self: flex-start;
+	background: #132a2a;
+	border: 1px solid #2a6b6b;
+}
+
+.chat-input {
+	padding: 12px;
+	border-top: 1px solid #26314f;
+}
+
+.tester {
+	margin: 0 12px 12px;
+	padding: 10px;
+}
+
+.tester-toggle {
+	width: auto;
+}
+
+.tester-body.hidden {
+	display: none;
+}
+
+.quick-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.quick-grid button {
+	background: #1a2547;
+	border-color: #3e538f;
+}
+
+.json-editor {
+	margin-top: 14px;
+}
+
+.json-editor h3 {
+	margin: 0 0 8px 0;
+	font-size: 14px;
+}
+
+.output {
+	margin-top: 10px;
+	background: #0a1127;
+	border: 1px solid #26314f;
+	border-radius: 8px;
+	padding: 10px;
+	max-height: 200px;
+	overflow: auto;
+}
+
+@media (max-width: 980px) {
+	.app-shell {
+		grid-template-columns: 1fr;
+		height: auto;
+	}
+}

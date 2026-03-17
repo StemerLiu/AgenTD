@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+	<title>TD 自动化 AI 控制台</title>
+	<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+	<div class="app-shell">
+		<aside class="left-panel">
+			<h1>TD 自动化控制台</h1>
+			<div class="section">
+				<h2>连接设置</h2>
+				<label for="tdHost">TD Host</label>
+				<input id="tdHost" type="text" value="127.0.0.1" />
+				<label for="tdPort">TD Port</label>
+				<input id="tdPort" type="number" value="9988" />
+			</div>
+			<div class="section">
+				<h2>模型配置</h2>
+				<label for="provider">Provider</label>
+				<select id="provider"></select>
+				<label for="model">Model</label>
+				<input id="model" type="text" />
+				<label for="baseUrl">Base URL</label>
+				<input id="baseUrl" type="text" />
+				<label for="apiKey">API Key</label>
+				<input id="apiKey" type="password" placeholder="sk-..." />
+				<label for="temperature">Temperature</label>
+				<input id="temperature" type="number" min="0" max="1.5" step="0.1" value="0.2" />
+				<div class="row">
+					<button id="saveConfigBtn" class="secondary">保存配置</button>
+					<button id="testModelBtn">测试连通</button>
+				</div>
+				<div id="modelStatus" class="status" aria-live="polite"></div>
+			</div>
+		</aside>
+
+		<main class="chat-panel">
+			<header class="chat-header">
+				<div>用户 ↔ AI 对话</div>
+				<div class="actions">
+					<button id="btnReload">先执行 reload</button>
+					<button id="btnDiagnostics" class="secondary">工程诊断</button>
+				</div>
+			</header>
+			<section id="chatMessages" class="messages" aria-live="polite"></section>
+			<footer class="chat-input">
+				<label for="userInput">消息输入</label>
+				<textarea id="userInput" rows="3" placeholder="输入你的目标，例如：在 /project1 下创建两个 CHOP 并连接到 merge1"></textarea>
+				<div class="row">
+					<button id="sendBtn">发送</button>
+					<button id="execSuggestedBtn" class="secondary">执行AI建议命令</button>
+				</div>
+			</footer>
+		</main>
+	</div>
+
+	<section class="tester">
+		<button id="toggleTester" class="tester-toggle">展开/收起 TD 命令测试区</button>
+		<div id="testerBody" class="tester-body hidden">
+			<div class="quick-grid" id="quickButtons"></div>
+			<div class="json-editor">
+				<h3>自定义命令 JSON</h3>
+				<label for="customCommand">命令内容</label>
+				<textarea id="customCommand" rows="8">{ "cmd":"list_children","parent":"/project1" }</textarea>
+				<div class="row">
+					<button id="sendCustomBtn">发送命令</button>
+					<button id="sendBatchBtn" class="secondary">执行批量(JSON数组)</button>
+				</div>
+			</div>
+			<pre id="testerOutput" class="output"></pre>
+		</div>
+	</section>
+
+	<script src="/app.js"></script>
+</body>
+</html>
