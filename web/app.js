@@ -11,16 +11,11 @@ const PROVIDER_PRESETS = {
 
 const QUICK_COMMANDS = [
 	{ label: "reload", command: { cmd: "reload" } },
-	{ label: "build_glsl_cube", command: { cmd: "build_glsl_cube", parent: "/project1" } },
-	{ label: "hover=1", command: { cmd: "hover", parent: "/project1", value: 1 } },
-	{ label: "hover=0", command: { cmd: "hover", parent: "/project1", value: 0 } },
 	{ label: "list_children", command: { cmd: "list_children", parent: "/project1" } },
 	{ label: "exists:/project1", command: { cmd: "exists", path: "/project1" } },
 	{ label: "inspect:/project1", command: { cmd: "inspect", path: "/project1" } },
 	{ label: "project_diagnostics", command: { cmd: "project_diagnostics", root: "/project1", recursive: true, include_clean: false, limit: 200 } },
 	{ label: "save_project", command: { cmd: "save_project" } },
-	{ label: "clear:/project1", command: { cmd: "clear", parent: "/project1" } },
-	{ label: "create constantCHOP", command: { cmd: "create", parent: "/project1", type: "constantCHOP", name: "const_web", params: { value0: 0.5 } } },
 	{ label: "replicate_framework", command: { cmd: "replicate_framework", file: "OP_Framework copy.json", clear_parent: true } }
 ];
 
@@ -44,7 +39,10 @@ const el = {
 	testerOutput: document.getElementById("testerOutput"),
 	testerBody: document.getElementById("testerBody"),
 	quickButtons: document.getElementById("quickButtons"),
-	sendBtn: document.getElementById("sendBtn")
+	sendBtn: document.getElementById("sendBtn"),
+	commandDetails: document.getElementById("commandDetails"),
+	commandSummary: document.getElementById("commandSummary"),
+	commandJsonOutput: document.getElementById("commandJsonOutput")
 };
 
 function appendMessage(role, content) {
@@ -202,6 +200,17 @@ function applyPresetForProvider() {
 	el.temperature.value = String(nextTemperature);
 }
 
+function renderSuggestedCommands(commands, options = {}) {
+	const arr = Array.isArray(commands) ? commands : [];
+	state.suggestedCommands = arr;
+	el.commandJsonOutput.textContent = JSON.stringify(arr, null, 2);
+	const suffix = options.suffix ? ` - ${options.suffix}` : "";
+	el.commandSummary.textContent = `AI生成命令 JSON（${arr.length} 条）${suffix}`;
+	if (options.autoOpen && arr.length) {
+		el.commandDetails.open = true;
+	}
+}
+
 function applyChatResult(result, aiBubble, aiReplyRef) {
 	if (!result || !result.ok) {
 		aiBubble.textContent = `调用失败: ${(result && result.error) || "未知错误"}`;
@@ -213,9 +222,12 @@ function applyChatResult(result, aiBubble, aiReplyRef) {
 		aiReplyRef = reply;
 		aiBubble.textContent = aiReplyRef;
 	}
-	state.suggestedCommands = Array.isArray(result.commands) ? result.commands : [];
-	if (state.suggestedCommands.length) {
-		appendMessage("ai", `已提取 ${state.suggestedCommands.length} 条命令，可点击“执行AI建议命令”`);
+	const nextCommands = Array.isArray(result.commands) ? result.commands : [];
+	renderSuggestedCommands(nextCommands, { autoOpen: nextCommands.length > 0, suffix: "最终结果" });
+	if (nextCommands.length) {
+		appendMessage("ai", `已提取 ${nextCommands.length} 条命令，可点击“执行AI建议命令”`);
+	} else {
+		appendMessage("ai", "AI 本次没有生成可执行命令，请检查模型返回是否包含 write_framework_json / replicate_framework 链路");
 	}
 	return aiReplyRef;
 }
@@ -243,6 +255,7 @@ async function sendChat() {
 	let lastDonePayload = null;
 	const aiBubble = appendMessage("ai", "");
 	el.sendBtn.disabled = true;
+	renderSuggestedCommands([], { suffix: "等待生成" });
 	try {
 		const resp = await fetch("/api/model/chat_stream", {
 			method: "POST",
@@ -290,6 +303,9 @@ async function sendChat() {
 				}
 				if (event === "stage") {
 					appendMessage("agent", data.message || `${data.stage || "agent"}: ${data.status || "running"}`);
+					if (data.stage === "executor" && data.status === "done" && Array.isArray(data.commands)) {
+						renderSuggestedCommands(data.commands, { autoOpen: true, suffix: "Executor阶段" });
+					}
 					continue;
 				}
 				if (event === "reply_delta") {
@@ -333,6 +349,7 @@ async function runSuggestedCommands() {
 		port: cfg.tdPort,
 		commands: state.suggestedCommands
 	});
+	renderSuggestedCommands(state.suggestedCommands, { autoOpen: true, suffix: `执行后 ok=${Boolean(result.ok)}` });
 	appendMessage("ai", `命令执行结果:\n${JSON.stringify(result, null, 2)}`);
 }
 

@@ -35,8 +35,7 @@ class App:
         """获取当前 App 单例"""
         return self.root.fetch(self.store_key, self)
 
-    def set_pars(self, node_path: str, params: Dict[str, Any]) -> None:
-        """批量设置参数"""
+    def _set_par_values(self, node_path: str, params: Dict[str, Any]) -> None:
         node = op(node_path)
         if not node:
             raise Exception(f'Node not found: {node_path}')
@@ -48,28 +47,22 @@ class App:
             try:
                 par.val = v
             except Exception:
-                # 某些参数是多值（如 value0,value1...），也可以直接 par.<name> = v
                 try:
                     setattr(node.par, k, v)
                 except Exception as e:
                     debug(f'Set param failed: {node.path}.{k} -> {v}: {e}')
 
-    def create(self, parent_path: str, op_type_token: str, name: Optional[str] = None,
-               params: Optional[Dict[str, Any]] = None) -> str:
-        """
-        创建一个子节点。
-        op_type_token：TouchDesigner 的 OP 类型字符串，例如 'constantCHOP', 'noiseCHOP', 'textDAT', 'baseCOMP'。
-        """
+    def _create_child(self, parent_path: str, op_type_token: str, name: Optional[str] = None,
+                      params: Optional[Dict[str, Any]] = None) -> str:
         parent = op(parent_path)
         if not parent:
             raise Exception(f'Parent not found: {parent_path}')
-        # 直接传入类型字符串给 create，兼容所有环境
         child = parent.create(op_type_token)
         if name:
             child.name = name
         self._enable_viewer(child)
         if params:
-            self.set_pars(child.path, params)
+            self._set_par_values(child.path, params)
         return child.path
 
     def _enable_viewer(self, node: Any) -> None:
@@ -88,11 +81,7 @@ class App:
         except Exception:
             pass
 
-    def connect(self, dest_path: str, src_paths: List[str]) -> None:
-        """
-        连线：把多个 src 输入连到目标节点的各个输入口。
-        适用于大多数 CHOP/TOP/SOP 等，使用 inputConnectors[i].connect(src)。
-        """
+    def _connect_inputs(self, dest_path: str, src_paths: List[str]) -> None:
         dest = op(dest_path)
         if not dest:
             raise Exception(f'Dest not found: {dest_path}')
@@ -101,18 +90,9 @@ class App:
             if not src:
                 raise Exception(f'Src not found: {sp}')
             try:
-                # TouchDesigner 的 OP 上没有 setInput 方法，正确方式是使用 inputConnectors
                 dest.inputConnectors[i].connect(src)
             except Exception as e:
                 debug(f'Connect failed: {dest_path}[{i}] <- {sp}: {e}')
-
-    def delete(self, node_path: str) -> str:
-        node = op(node_path)
-        if not node:
-            raise Exception(f'Node not found: {node_path}')
-        path = node.path
-        node.destroy()
-        return path
 
     def exists(self, node_path: str) -> bool:
         return bool(op(node_path))
@@ -225,11 +205,7 @@ class App:
         except Exception:
             return []
 
-    def clear(self, parent_path: str) -> int:
-        """
-        删除指定父节点下的所有直接子组件（不删除父本身）。
-        返回删除数量。
-        """
+    def _clear_children(self, parent_path: str) -> int:
         parent = op(parent_path)
         if not parent:
             raise Exception(f'Parent not found: {parent_path}')
@@ -242,17 +218,6 @@ class App:
             except Exception as e:
                 debug(f'Destroy failed: {ch.path}: {e}')
         return cnt
-
-    def save_tox(self, comp_path: str, file_path: str) -> str:
-        """
-        保存组件为 .tox
-        """
-        comp = op(comp_path)
-        if not comp or comp.opType != 'COMP':
-            raise Exception(f'COMP not found: {comp_path}')
-        abs_path = self._abs(file_path)
-        comp.save(abs_path)
-        return abs_path
 
     def save_project(self, file_path: Optional[str] = None) -> str:
         """
@@ -297,9 +262,9 @@ class App:
         }
         """
         for n in cfg.get('nodes', []):
-            self.create(n['parent'], n['type'], n.get('name'), n.get('params'))
+            self._create_child(n['parent'], n['type'], n.get('name'), n.get('params'))
         for w in cfg.get('wires', []):
-            self.connect(w['dest'], w['src'])
+            self._connect_inputs(w['dest'], w['src'])
 
     def replicate_framework(self, framework_file: str, clear_parent: bool = True) -> Dict[str, Any]:
         abs_path = self._abs(framework_file)
@@ -309,7 +274,7 @@ class App:
             raise Exception('framework json must be a list')
         records = self._collect_framework_nodes(forest)
         if clear_parent:
-            self.clear('/project1')
+            self._clear_children('/project1')
         created = 0
         for rec in sorted(records, key=lambda x: x['path'].count('/')):
             node_path = rec['path']
@@ -323,7 +288,7 @@ class App:
                     existing.destroy()
                 except Exception:
                     pass
-            self.create(parent_path, rec['type'], rec['name'])
+            self._create_child(parent_path, rec['type'], rec['name'])
             node = op(node_path)
             if not node:
                 raise Exception(f'Create failed: {node_path}')
@@ -1087,186 +1052,6 @@ class App:
         if os.path.isabs(p):
             return p
         return os.path.join(project.folder, p)
-
-    def build_glsl_cube(self, parent_path: str = '/project1') -> str:
-        """
-        在指定父节点下搭建一个使用 GLSL MAT 渲染的自转立方体：
-        - 立方体默认白色；
-        - 预留 uHover uniform（0/1）用于切换成绿色；
-        - 通过给 geo 的旋转参数添加表达式实现自转；
-        返回渲染输出 TOP 的路径。
-        """
-        parent = op(parent_path)
-        if not parent:
-            raise Exception(f'Parent not found: {parent_path}')
-
-        # 清空原有内容
-        for ch in list(parent.children):
-            try:
-                ch.destroy()
-            except Exception:
-                pass
-
-        # 基础节点并稳定命名，便于后续访问
-        box = parent.create('boxSOP', 'cube_box')
-        geo = parent.create('geometryCOMP', 'geo')
-        cam = parent.create('cameraCOMP', 'cam')
-        light = parent.create('lightCOMP', 'light')
-        rndr = parent.create('renderTOP', 'render')
-        mat = parent.create('glslMAT', 'mat_glsl')
-
-        # 连接与参数
-        try:
-            geo.par.soppath = box
-        except Exception:
-            try:
-                geo.par.soppath = box.path
-            except Exception:
-                # 兜底：直接把 SOP 接到 geo 的第 0 号输入
-                try:
-                    geo.inputConnectors[0].connect(box)
-                except Exception:
-                    pass
-        try:
-            geo.par.mat = mat
-        except Exception:
-            try:
-                geo.par.material = mat.path
-            except Exception:
-                pass
-
-        try:
-            rndr.par.camera = cam
-        except Exception:
-            try:
-                rndr.par.cam = cam.path
-            except Exception:
-                pass
-        try:
-            rndr.par.geometry = geo
-        except Exception:
-            try:
-                rndr.par.geometries = geo.path
-            except Exception:
-                pass
-
-        # 自转：给几何体添加绕 Y 轴旋转表达式（每秒 30 度）
-        try:
-            geo.par.ry.expr = 'absTime.seconds * 30'
-        except Exception:
-            try:
-                geo.par.ry = 0
-            except Exception:
-                pass
-
-        # 着色器 Text DAT
-        vdat = parent.create('textDAT', 'cube_vert')
-        pdat = parent.create('textDAT', 'cube_frag')
-        v_src = '\n'.join([
-            'void main() {',
-            '    vec4 worldSpacePos = TDDeform(P);',
-            '    gl_Position = TDWorldToProj(worldSpacePos);',
-            '}'
-        ])
-        p_src = '\n'.join([
-            'uniform float uHover;',
-            '',
-            'out vec4 fragColor;',
-            'void main() {',
-            '    TDCheckDiscard();',
-            '    vec3 white = vec3(1.0);',
-            '    vec3 green = vec3(0.0, 1.0, 0.0);',
-            '    vec3 col = mix(white, green, step(0.5, uHover));',
-            '    vec4 color = vec4(col, 1.0);',
-            '    TDAlphaTest(color.a);',
-            '    fragColor = TDOutputSwizzle(color);',
-            '}'
-        ])
-        try:
-            vdat.text = v_src
-            pdat.text = p_src
-        except Exception:
-            # 某些版本使用 .write() 接口
-            try:
-                vdat.write(v_src)
-                pdat.write(p_src)
-            except Exception as e:
-                debug(f'set shader text failed: {e}')
-
-        # 绑定 GLSL MAT 的顶点/片元 DAT
-        try:
-            mat.par.vdat = vdat
-        except Exception:
-            mat.par.vdat = vdat.path
-        try:
-            mat.par.pdat = pdat
-        except Exception:
-            mat.par.pdat = pdat.path
-
-        # 预置一个 uniform：uHover，默认 0（白色）
-        try:
-            mat.par.vec0name = 'uHover'
-            mat.par.vec0value0 = 0
-        except Exception:
-            pass
-
-        # 创建一个展示容器，用于面板拾取（hover 检测）
-        viewer = parent.create('containerCOMP', 'viewer')
-        # 将渲染结果作为容器背景 TOP（不同版本短名不同，做兼容）
-        try:
-            viewer.par.bgop = rndr
-        except Exception:
-            try:
-                viewer.par.top = rndr.path
-            except Exception:
-                pass
-
-        # Panel CHOP 读取容器的鼠标 inside 通道
-        pch = parent.create('panelCHOP', 'viewer_panel')
-        try:
-            pch.par.component = viewer
-        except Exception:
-            try:
-                pch.par.component = viewer.path
-            except Exception:
-                try:
-                    pch.par.panel = viewer
-                except Exception:
-                    pch.par.panel = viewer.path
-        # 仅输出 inside 面板值，减少后续选择复杂度
-        try:
-            pch.par.select = 'inside'
-        except Exception:
-            pass
-
-        # 只保留 inside 通道
-        sel = parent.create('selectCHOP', 'sel_inside')
-        try:
-            sel.setInput(0, pch)
-        except Exception:
-            try:
-                sel.inputConnectors[0].connect(pch)
-            except Exception:
-                pass
-        try:
-            sel.par.chans = 'inside'
-        except Exception:
-            try:
-                sel.par.channelnames = 'inside'
-            except Exception:
-                pass
-
-        # 悬停联动采用表达式绑定，不使用 CHOP Execute DAT
-        # 兼容方案：不使用 CHOP Execute DAT，直接给 GLSL MAT 的 uHover 参数写表达式引用 inside 通道
-        try:
-            mat.par.vec0value0.expr = "1 if op('{}')['inside'][0] > 0.5 else 0".format(sel.path)
-        except Exception:
-            try:
-                mat.par.vec0value0.expr = "1 if float(op('{}')['inside'][0]) > 0.5 else 0".format(sel.path)
-            except Exception:
-                pass
-
-        return rndr.path
 
 def debug(msg: str) -> None:
     # TouchDesigner 的调试输出，可以改为在 Textport 或自定义日志 DAT 里打印

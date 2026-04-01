@@ -40,9 +40,10 @@ def send_and_recv(cmd_obj):
 
 cmds = [
     {"cmd": "reload"},
-    {"cmd": "build_glsl_cube", "parent": "/project1"},
-    {"cmd": "hover", "parent": "/project1", "value": 1},
-    {"cmd": "hover", "parent": "/project1", "value": 0},
+    {"cmd": "exists", "path": "/project1"},
+    {"cmd": "inspect", "path": "/project1"},
+    {"cmd": "project_diagnostics", "root": "/project1", "recursive": True, "include_clean": False, "limit": 50},
+    {"cmd": "replicate_framework", "file": "OP_Framework copy.json", "clear_parent": True},
 ]
 
 if __name__ == '__main__':

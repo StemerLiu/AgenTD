@@ -37,18 +37,10 @@ def _load_disk_module(module_name: str, filename: str):
 def dispatch(payload: str) -> str:
     """
     传入 JSON 字符串，返回结果字符串（可选）
-    支持的指令：
-      - create: { "cmd":"create", "parent":"/project1", "type":"constantCHOP", "name":"const1", "params":{...} }
-      - par:    { "cmd":"par", "path":"/project1/const1", "params":{ "value0":0.8 } }
-      - connect:{ "cmd":"connect", "dest":"/project1/merge1", "src":["/project1/const1","/project1/noise1"] }
-      - save_tox:{ "cmd":"save_tox", "path":"/project1/app", "file":"components/app.tox" }
-      - save_project:{ "cmd":"save_project", "file":"build/project_saved.toe" }
-      - clear:  { "cmd":"clear", "parent":"/project1" }
-      - build_glsl_cube:{ "cmd":"build_glsl_cube", "parent":"/project1" }
-      - hover:  { "cmd":"hover", "value":1 }
+    当前唯一结构编辑协议：
       - reload: { "cmd":"reload" }
       - replicate_framework:{ "cmd":"replicate_framework", "file":"OP_Framework copy.json", "clear_parent":true }
-      - delete:{ "cmd":"delete", "path":"/project1/node1" }
+      - save_project:{ "cmd":"save_project", "file":"build/project_saved.toe" }
       - exists:{ "cmd":"exists", "path":"/project1/node1" }
       - list_children:{ "cmd":"list_children", "parent":"/project1" }
       - inspect:{ "cmd":"inspect", "path":"/project1/node1" }
@@ -58,40 +50,12 @@ def dispatch(payload: str) -> str:
     cmd = json.loads(payload)
 
     c = cmd.get('cmd')
-    if c == 'create':
-        p = a.create(cmd['parent'], cmd['type'], cmd.get('name'), cmd.get('params'))
-        return f'created:{p}'
-    elif c == 'par':
-        a.set_pars(cmd['path'], cmd['params'])
-        return 'par:ok'
-    elif c == 'connect':
-        a.connect(cmd['dest'], cmd['src'])
-        return 'connect:ok'
-    elif c == 'save_tox':
-        fp = a.save_tox(cmd['path'], cmd['file'])
-        return f'save_tox:{fp}'
-    elif c == 'save_project':
+    deprecated = {'create', 'par', 'connect', 'clear', 'delete', 'remove', 'destroy', 'hover', 'build_glsl_cube', 'save_tox'}
+    if c in deprecated:
+        raise Exception(f'Deprecated cmd: {c}. Use OP_Framework JSON + reload -> replicate_framework -> save_project.')
+    if c == 'save_project':
         fp = a.save_project(cmd.get('file'))
         return f'save_project:{fp}'
-    elif c == 'clear':
-        cnt = a.clear(cmd.get('parent', '/project1'))
-        return f'clear:{cnt}'
-    elif c == 'build_glsl_cube':
-        rp = a.build_glsl_cube(cmd.get('parent', '/project1'))
-        return f'render:{rp}'
-    elif c == 'hover':
-        # 设置 GLSL MAT 的 uHover 值；优先使用传入路径，否则在 parent 下寻找 build_glsl_cube 创建的 mat_glsl
-        parent = cmd.get('parent', '/project1')
-        mpath = cmd.get('mat')
-        mat = op(mpath) if mpath else op(f"{parent}/mat_glsl")
-        if not mat:
-            raise Exception('glslMAT not found')
-        val = float(cmd.get('value', 0))
-        try:
-            mat.par.vec0value0 = val
-        except Exception:
-            pass
-        return f'hover:{int(val)}'
     elif c == 'reload':
         disk_app = _load_disk_module('app', 'app.py')
         new_app = disk_app.App()
@@ -100,9 +64,6 @@ def dispatch(payload: str) -> str:
     elif c == 'replicate_framework':
         result = a.replicate_framework(cmd['file'], bool(cmd.get('clear_parent', True)))
         return f"replicate_framework:file={result['file']};nodes={result['nodes']}"
-    elif c in ('delete', 'remove', 'destroy'):
-        p = a.delete(cmd['path'])
-        return f'delete:{p}'
     elif c == 'exists':
         ok = a.exists(cmd['path'])
         return f'exists:{1 if ok else 0}'

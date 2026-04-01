@@ -5,7 +5,8 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib import request, error
 
 
-WEB_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'web')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+WEB_ROOT = os.path.join(PROJECT_ROOT, 'web')
 DEFAULT_TD_HOST = '127.0.0.1'
 DEFAULT_TD_PORT = 9988
 DEFAULT_TIMEOUT = 8
@@ -24,9 +25,8 @@ PROVIDER_PRESETS = {
 
 
 ALLOWED_CMDS = [
-	'reload', 'create', 'par', 'connect', 'clear', 'save_tox', 'save_project',
-	'build_glsl_cube', 'hover', 'replicate_framework', 'delete', 'exists',
-	'list_children', 'inspect', 'project_diagnostics'
+	'write_framework_json', 'reload', 'replicate_framework', 'save_project',
+	'exists', 'list_children', 'inspect', 'project_diagnostics'
 ]
 
 PLANNER_PROMPT = (
@@ -40,7 +40,26 @@ EXECUTOR_PROMPT = (
 	'只允许使用以下cmd: ' + ', '.join(ALLOWED_CMDS) + '。'
 	'仅输出JSON对象，不要输出Markdown。'
 	'JSON格式: {"reply":"给用户的执行说明", "commands":[{"cmd":"..."}], "checks":["执行前校验点"]}。'
-	'命令顺序必须安全，复杂任务遵循 reload -> create -> par -> connect。'
+	'任何涉及节点创建、删除、连线、参数修改、自定义参数、DAT内容修改的结构编辑，'
+	'都必须通过 OP_Framework 标准JSON文件完成，并使用 reload -> replicate_framework -> save_project 的链路。'
+	'必须先输出 write_framework_json 命令，把完整框架树写入 OP_Framework copy.json。'
+	'write_framework_json 的格式为 {"cmd":"write_framework_json","file":"OP_Framework copy.json","forest":[...]}。'
+	'forest 必须是 OP_Framework 标准树：每个节点为 {"nodeName":{"relPath":"...","type":"...","pos":{"x":0,"y":0},"parameters":{"Page":{"par":{"val":"...","mode":"ParMode.CONSTANT"}}},"connections":{"inputs":[{"port":0,"links":["srcNode"]}]}}}。'
+	'如果用户要求连接，必须把连接写进目标节点的 connections.inputs。'
+	'如果用户要求改参数，必须把参数写进 parameters 页面里，不能留空。'
+	'如果要创建多个节点，不能把它们都放在相同坐标，可做简单横向布局。'
+	'随后再输出 replicate_framework 所需命令。'
+	'禁止输出 create/par/connect/clear/delete/hover/build_glsl_cube 等旧式编辑命令。'
+)
+
+REPAIR_EXECUTOR_PROMPT = (
+	'你是修复执行者（Executor Repair）。'
+	'你会收到用户目标、上一版命令和校验失败原因。'
+	'你必须输出修复后的最终 JSON，不要解释，不要Markdown。'
+	'只允许使用以下cmd: ' + ', '.join(ALLOWED_CMDS) + '。'
+	'JSON格式: {"reply":"", "commands":[{"cmd":"..."}], "checks":[""]}。'
+	'必须修复所有校验失败项，尤其是缺失连接、缺失参数设置、错误字段名、节点重叠。'
+	'必须输出可直接执行的 write_framework_json -> reload -> replicate_framework 链路。'
 )
 
 REVIEWER_PROMPT = (
@@ -78,6 +97,517 @@ def _send_td_command(cmd_obj: dict, host: str, port: int, timeout_sec: int):
 				break
 	text = received.decode('utf-8', errors='ignore').strip()
 	return text
+
+
+def _resolve_project_file(file_path: str):
+	if not isinstance(file_path, str) or not file_path.strip():
+		file_path = 'OP_Framework copy.json'
+	if os.path.isabs(file_path):
+		return file_path
+	return os.path.join(PROJECT_ROOT, file_path)
+
+
+def _execute_local_command(cmd_obj: dict):
+	if not isinstance(cmd_obj, dict):
+		raise ValueError('invalid_command')
+	cmd = str(cmd_obj.get('cmd') or '')
+	if cmd != 'write_framework_json':
+		return None
+	target_path = _resolve_project_file(str(cmd_obj.get('file') or 'OP_Framework copy.json'))
+	forest = cmd_obj.get('forest', None)
+	content = cmd_obj.get('content', None)
+	if forest is None and not isinstance(content, str):
+		raise ValueError('write_framework_json requires forest or content')
+	if forest is not None:
+		forest = _normalize_framework_forest(forest)
+		body = json.dumps(forest, indent='\t', ensure_ascii=False)
+	else:
+		body = str(content)
+	parent_dir = os.path.dirname(target_path)
+	if parent_dir and not os.path.exists(parent_dir):
+		os.makedirs(parent_dir, exist_ok=True)
+	with open(target_path, 'w', encoding='utf-8') as f:
+		f.write(body)
+	node_count = len(forest) if isinstance(forest, list) else 0
+	return f'write_framework_json:file={target_path};nodes={node_count}'
+
+
+def _normalize_op_type(op_type: str, node_name: str = ''):
+	raw = str(op_type or '').strip()
+	if not raw:
+		raw = 'baseCOMP'
+	low = raw.lower()
+	compact_name = ''.join([ch for ch in str(node_name or '').lower() if ch.isalnum()])
+	aliases = {
+		'audiofilein': 'audiofileinCHOP',
+		'audiofileinchop': 'audiofileinCHOP',
+		'audiodeviceout': 'audiodeviceoutCHOP',
+		'audiodeviceoutchop': 'audiodeviceoutCHOP',
+		'audiodevicein': 'audiodeviceinCHOP',
+		'audiodeviceinchop': 'audiodeviceinCHOP',
+		'container': 'containerCOMP',
+		'base': 'baseCOMP',
+		'null': 'nullCHOP'
+	}
+	name_aliases = {
+		'audiofilein': 'audiofileinCHOP',
+		'audiodeviceout': 'audiodeviceoutCHOP',
+		'audiodevicein': 'audiodeviceinCHOP',
+		'moviefilein': 'moviefileinTOP',
+		'audiospectrum': 'audiospectrumCHOP',
+		'nulltop': 'nullTOP',
+		'nullchop': 'nullCHOP',
+		'basecomp': 'baseCOMP',
+		'containercomp': 'containerCOMP'
+	}
+	if low in aliases:
+		return aliases[low]
+	if low in ('top', 'chop', 'sop', 'comp', 'dat', 'mat'):
+		for key, concrete in name_aliases.items():
+			if key in compact_name:
+				return concrete
+	return raw
+
+
+def _normalize_rel_path(node_name: str, raw_rel_path: str = '', parent_path: str = '/project1'):
+	name = str(node_name or '').strip() or 'node1'
+	path = str(raw_rel_path or '').strip()
+	if path.startswith('/'):
+		return path
+	if path in ('', '.'):
+		return f'{parent_path.rstrip("/")}/{name}'
+	if path.startswith('./'):
+		path = path[2:]
+	if '/' not in path:
+		return f'{parent_path.rstrip("/")}/{path}'
+	return f'/{path.lstrip("/")}'
+
+
+def _normalize_param_entry(raw_value):
+	if isinstance(raw_value, dict):
+		out = dict(raw_value)
+		if 'mode' not in out:
+			out['mode'] = 'ParMode.CONSTANT'
+		if out.get('mode') != 'ParMode.BIND' and 'val' not in out:
+			out['val'] = ''
+		return out
+	return {
+		'val': str(raw_value),
+		'mode': 'ParMode.CONSTANT'
+	}
+
+
+def _normalize_parameter_groups(raw_params):
+	if not isinstance(raw_params, dict) or not raw_params:
+		return {}
+	is_paged = True
+	for page_val in raw_params.values():
+		if not isinstance(page_val, dict):
+			is_paged = False
+			break
+		for par_val in page_val.values():
+			if not isinstance(par_val, dict):
+				is_paged = False
+				break
+		if not is_paged:
+			break
+	if is_paged:
+		out = {}
+		for page_name, page_pars in raw_params.items():
+			page_out = {}
+			for par_name, par_val in page_pars.items():
+				page_out[str(par_name)] = _normalize_param_entry(par_val)
+			out[str(page_name)] = page_out
+		return out
+	return {
+		'Auto': {str(par_name): _normalize_param_entry(par_val) for par_name, par_val in raw_params.items()}
+	}
+
+
+def _normalize_position(spec: dict):
+	pos = spec.get('pos')
+	if isinstance(pos, dict):
+		return {
+			'x': int(float(pos.get('x', 0) or 0)),
+			'y': int(float(pos.get('y', 0) or 0))
+		}
+	node_pos = spec.get('nodePosition')
+	if isinstance(node_pos, (list, tuple)) and len(node_pos) >= 2:
+		return {
+			'x': int(float(node_pos[0] or 0)),
+			'y': int(float(node_pos[1] or 0))
+		}
+	return {'x': 0, 'y': 0}
+
+
+def _is_canonical_framework_forest(raw_forest):
+	if not isinstance(raw_forest, list):
+		return False
+	for item in raw_forest:
+		if not isinstance(item, dict) or len(item) != 1:
+			return False
+		node_info = list(item.values())[0]
+		if not isinstance(node_info, dict):
+			return False
+		if 'relPath' not in node_info or 'type' not in node_info:
+			return False
+	return True
+
+
+def _parse_port_index(raw_port):
+	if isinstance(raw_port, int):
+		return max(0, raw_port)
+	text = str(raw_port or '').strip()
+	digits = ''.join([ch for ch in text if ch.isdigit()])
+	if not digits:
+		return 0
+	val = int(digits)
+	return max(0, val - 1 if val > 0 else 0)
+
+
+def _build_canonical_forest_from_legacy(raw_forest):
+	nodes = {}
+	connections = []
+	for item in raw_forest:
+		if not isinstance(item, dict):
+			continue
+		item_type = str(item.get('type', '') or '').strip().lower()
+		if item_type == 'connection' or item.get('source') or item.get('destination') or item.get('dest'):
+			connections.append(item)
+			continue
+		node_name = str(item.get('name') or item.get('node') or '').strip()
+		if not node_name:
+			continue
+		parent_path = str(item.get('parent') or '/project1').strip() or '/project1'
+		rel_path = _normalize_rel_path(node_name, str(item.get('relPath') or ''), parent_path)
+		nodes[rel_path] = {
+			'name': node_name,
+			'relPath': rel_path,
+			'type': _normalize_op_type(str(item.get('type') or item.get('opType') or 'baseCOMP'), node_name),
+			'pos': _normalize_position(item),
+			'parameters': _normalize_parameter_groups(item.get('parameters', {})),
+			'customParameters': item.get('customParameters', {}) if isinstance(item.get('customParameters', {}), dict) else {},
+			'drawState': item.get('drawState', {}) if isinstance(item.get('drawState', {}), dict) else {},
+			'children': []
+		}
+
+	for link in connections:
+		src_name = str(link.get('source') or link.get('src') or '').strip()
+		dest_name = str(link.get('destination') or link.get('dest') or '').strip()
+		if not src_name or not dest_name:
+			continue
+		dest_node = None
+		for path_key, node_info in nodes.items():
+			if node_info.get('name') == dest_name or path_key.endswith('/' + dest_name):
+				dest_node = node_info
+				break
+		if dest_node is None:
+			continue
+		port = _parse_port_index(link.get('destinationInlet', link.get('port', 0)))
+		conns = dest_node.setdefault('connections', {})
+		inputs = conns.setdefault('inputs', [])
+		entry = None
+		for item in inputs:
+			if isinstance(item, dict) and int(item.get('port', 0)) == port:
+				entry = item
+				break
+		if entry is None:
+			entry = {'port': port, 'links': []}
+			inputs.append(entry)
+		entry['links'].append(src_name)
+
+	def attach_children(node_path: str):
+		node_info = nodes[node_path]
+		children = []
+		prefix = node_path + '/'
+		for child_path in sorted(nodes.keys()):
+			if child_path == node_path or not child_path.startswith(prefix):
+				continue
+			parent_path = child_path.rsplit('/', 1)[0]
+			if parent_path != node_path:
+				continue
+			attach_children(child_path)
+			child_info = dict(nodes[child_path])
+			child_name = child_info.pop('name')
+			children.append({child_name: child_info})
+		node_info['children'] = children
+
+	top_level = []
+	for path_key in sorted(nodes.keys()):
+		parent_path = path_key.rsplit('/', 1)[0]
+		if parent_path != '/project1':
+			continue
+		attach_children(path_key)
+		node_info = dict(nodes[path_key])
+		node_name = node_info.pop('name')
+		top_level.append({node_name: node_info})
+	return top_level
+
+
+def _normalize_framework_forest(raw_forest):
+	if _is_canonical_framework_forest(raw_forest):
+		return _auto_layout_canonical_forest(_normalize_canonical_forest(raw_forest))
+	if not isinstance(raw_forest, list):
+		return []
+	return _auto_layout_canonical_forest(_build_canonical_forest_from_legacy(raw_forest))
+
+
+def _normalize_canonical_forest(forest, parent_path: str = '/project1'):
+	if not isinstance(forest, list):
+		return []
+	out = []
+	for item in forest:
+		if not isinstance(item, dict) or len(item) != 1:
+			continue
+		node_name = list(item.keys())[0]
+		node_info = item.get(node_name, {})
+		if not isinstance(node_info, dict):
+			continue
+		info = dict(node_info)
+		info['relPath'] = _normalize_rel_path(node_name, str(info.get('relPath') or ''), parent_path)
+		info['type'] = _normalize_op_type(str(info.get('type') or 'baseCOMP'), node_name)
+		info['pos'] = _normalize_position(info)
+		info['parameters'] = _normalize_parameter_groups(info.get('parameters', {}))
+		if not isinstance(info.get('customParameters', {}), dict):
+			info['customParameters'] = {}
+		if not isinstance(info.get('drawState', {}), dict):
+			info['drawState'] = {}
+		children_parent = info['relPath']
+		info['children'] = _normalize_canonical_forest(info.get('children', []), children_parent)
+		out.append({node_name: info})
+	return out
+
+
+def _walk_framework_nodes(forest):
+	if not isinstance(forest, list):
+		return
+	for item in forest:
+		if not isinstance(item, dict) or len(item) != 1:
+			continue
+		node_name = list(item.keys())[0]
+		node_info = item.get(node_name, {})
+		if not isinstance(node_info, dict):
+			continue
+		yield node_name, node_info
+		children = node_info.get('children', [])
+		if isinstance(children, list):
+			for child in _walk_framework_nodes(children):
+				yield child
+
+
+def _auto_layout_canonical_forest(forest):
+	if not isinstance(forest, list):
+		return []
+	out = json.loads(json.dumps(forest, ensure_ascii=False))
+
+	def layout_siblings(items):
+		if not isinstance(items, list):
+			return
+		seen = {}
+		for item in items:
+			if not isinstance(item, dict) or len(item) != 1:
+				continue
+			node_info = list(item.values())[0]
+			if not isinstance(node_info, dict):
+				continue
+			pos = node_info.get('pos')
+			if not isinstance(pos, dict):
+				pos = {'x': 0, 'y': 0}
+				node_info['pos'] = pos
+			x = int(float(pos.get('x', 0) or 0))
+			y = int(float(pos.get('y', 0) or 0))
+			key = (x, y)
+			offset = seen.get(key, 0)
+			if offset > 0:
+				pos['x'] = x + 180 * offset
+				pos['y'] = y
+			seen[key] = offset + 1
+			children = node_info.get('children', [])
+			if isinstance(children, list):
+				layout_siblings(children)
+
+	layout_siblings(out)
+	return out
+
+
+def _collect_framework_parameter_names(forest):
+	names = set()
+	for _, node_info in _walk_framework_nodes(forest):
+		for group_name in ('parameters', 'customParameters'):
+			group = node_info.get(group_name, {})
+			if not isinstance(group, dict):
+				continue
+			for _, page_pars in group.items():
+				if not isinstance(page_pars, dict):
+					continue
+				for par_name in page_pars.keys():
+					names.add(str(par_name).strip().lower())
+	return names
+
+
+def _framework_has_connections(forest):
+	for _, node_info in _walk_framework_nodes(forest):
+		connections = node_info.get('connections', {})
+		if not isinstance(connections, dict):
+			continue
+		inputs = connections.get('inputs', [])
+		if isinstance(inputs, list) and inputs:
+			for entry in inputs:
+				if isinstance(entry, dict) and isinstance(entry.get('links'), list) and entry.get('links'):
+					return True
+	return False
+
+
+def _count_framework_nodes(forest):
+	count = 0
+	for _ in _walk_framework_nodes(forest):
+		count += 1
+	return count
+
+
+def _framework_has_distinct_positions(forest):
+	pos_set = set()
+	count = 0
+	for _, node_info in _walk_framework_nodes(forest):
+		count += 1
+		pos = node_info.get('pos', {})
+		if not isinstance(pos, dict):
+			continue
+		x = int(float(pos.get('x', 0) or 0))
+		y = int(float(pos.get('y', 0) or 0))
+		pos_set.add((x, y))
+	if count <= 1:
+		return True
+	return len(pos_set) > 1
+
+
+def _framework_has_family_placeholder_types(forest):
+	for _, node_info in _walk_framework_nodes(forest):
+		op_type = str(node_info.get('type') or '').strip().lower()
+		if op_type in ('top', 'chop', 'sop', 'comp', 'dat', 'mat'):
+			return True
+	return False
+
+
+def _framework_has_relative_paths(forest):
+	for _, node_info in _walk_framework_nodes(forest):
+		rel_path = str(node_info.get('relPath') or '').strip()
+		if not rel_path.startswith('/'):
+			return True
+	return False
+
+
+def _framework_has_placeholder_parameter_names(forest):
+	for _, node_info in _walk_framework_nodes(forest):
+		group = node_info.get('parameters', {})
+		if not isinstance(group, dict):
+			continue
+		for page_name, page_pars in group.items():
+			if str(page_name).strip().lower() in ('page', 'defaultpage'):
+				return True
+			if not isinstance(page_pars, dict):
+				continue
+			for par_name in page_pars.keys():
+				if str(par_name).strip().lower() in ('par', 'param', 'parameter'):
+					return True
+	return False
+
+
+def _extract_write_framework_forest(commands):
+	if not isinstance(commands, list):
+		return None
+	for item in commands:
+		if not isinstance(item, dict):
+			continue
+		if str(item.get('cmd') or '') == 'write_framework_json':
+			forest = item.get('forest')
+			if isinstance(forest, list):
+				return forest
+	return None
+
+
+def _validate_framework_commands(user_goal: str, commands: list):
+	issues = []
+	if not isinstance(commands, list) or not commands:
+		return ['未生成任何可执行命令']
+	cmd_names = [str(item.get('cmd') or '') for item in commands if isinstance(item, dict)]
+	if 'write_framework_json' not in cmd_names:
+		issues.append('缺少 write_framework_json 命令')
+	if 'replicate_framework' not in cmd_names:
+		issues.append('缺少 replicate_framework 命令')
+	forest = _extract_write_framework_forest(commands)
+	if not isinstance(forest, list) or not forest:
+		issues.append('write_framework_json 未包含有效 forest')
+		return issues
+	goal = str(user_goal or '').lower()
+	goal_cn = str(user_goal or '')
+	if _framework_has_family_placeholder_types(forest):
+		issues.append('forest 中仍存在 TOP/CHOP/COMP 等占位类型，必须改成具体 TD OP 类型')
+	if _framework_has_relative_paths(forest):
+		issues.append('forest 中 relPath 不是绝对路径，必须写成 /project1/... 形式')
+	if _framework_has_placeholder_parameter_names(forest):
+		issues.append('forest 中使用了 Page/par 这类占位参数结构，必须改成真实页面名和参数名')
+	if ('连接' in goal_cn or '连线' in goal_cn or 'connect' in goal) and not _framework_has_connections(forest):
+		issues.append('用户要求连接，但 forest 中没有 connections.inputs')
+	param_names = _collect_framework_parameter_names(forest)
+	if ('单声道' in goal_cn or 'mono' in goal or '单通道' in goal_cn) and not ({'mono', 'channels', 'chanmode', 'channelmode'} & param_names):
+		issues.append('用户要求单声道，但 forest 中没有 mono/channels 等相关参数设置')
+	if _count_framework_nodes(forest) > 1 and not _framework_has_distinct_positions(forest):
+		issues.append('多个节点位置完全重叠，需要给出不同坐标')
+	return issues
+
+
+def _normalize_command(item: dict):
+	if not isinstance(item, dict):
+		return None
+	cmd = str(item.get('cmd') or '').strip()
+	if not cmd:
+		return None
+	if cmd == 'write_framework_json':
+		return {
+			'cmd': 'write_framework_json',
+			'file': str(item.get('file') or item.get('source') or 'OP_Framework copy.json'),
+			'forest': _normalize_framework_forest(item.get('forest', []))
+		}
+	if cmd == 'reload':
+		return {'cmd': 'reload'}
+	if cmd == 'replicate_framework':
+		return {
+			'cmd': 'replicate_framework',
+			'file': str(item.get('file') or item.get('source') or 'OP_Framework copy.json'),
+			'clear_parent': bool(item.get('clear_parent', True))
+		}
+	if cmd == 'save_project':
+		out = {'cmd': 'save_project'}
+		if item.get('file'):
+			out['file'] = str(item.get('file'))
+		return out
+	if cmd == 'exists':
+		return {'cmd': 'exists', 'path': str(item.get('path') or '/project1')}
+	if cmd == 'inspect':
+		return {'cmd': 'inspect', 'path': str(item.get('path') or '/project1')}
+	if cmd == 'list_children':
+		return {'cmd': 'list_children', 'parent': str(item.get('parent') or '/project1')}
+	if cmd == 'project_diagnostics':
+		return {
+			'cmd': 'project_diagnostics',
+			'root': str(item.get('root') or '/project1'),
+			'recursive': bool(item.get('recursive', True)),
+			'include_clean': bool(item.get('include_clean', False)),
+			'limit': int(item.get('limit', 200))
+		}
+	return item
+
+
+def _normalize_commands(commands: list):
+	if not isinstance(commands, list):
+		return []
+	out = []
+	for item in commands:
+		norm = _normalize_command(item)
+		if isinstance(norm, dict) and norm.get('cmd'):
+			out.append(norm)
+	return out
 
 
 def _build_provider_config(raw: dict):
@@ -284,42 +814,14 @@ def _call_agent_json(system_prompt: str, user_content: str, config: dict, timeou
 def _command_guard_checks(command: dict):
 	cmd = str(command.get('cmd') or '')
 	checks = []
-	if cmd in ('exists', 'inspect', 'list_children', 'project_diagnostics', 'reload', 'save_tox', 'save_project'):
+	if cmd in ('exists', 'inspect', 'list_children', 'project_diagnostics', 'reload', 'save_project'):
 		return checks
-	if cmd in ('create', 'clear', 'build_glsl_cube'):
-		parent = command.get('parent')
-		if isinstance(parent, str) and parent:
-			checks.append({'cmd': 'exists', 'path': parent})
-			checks.append({'cmd': 'inspect', 'path': parent})
-	if cmd == 'par':
-		path = command.get('path')
-		if isinstance(path, str) and path:
-			checks.append({'cmd': 'exists', 'path': path})
-			checks.append({'cmd': 'inspect', 'path': path})
-	if cmd == 'connect':
-		dest = command.get('dest')
-		if isinstance(dest, str) and dest:
-			checks.append({'cmd': 'exists', 'path': dest})
-			checks.append({'cmd': 'inspect', 'path': dest})
-		src = command.get('src')
-		if isinstance(src, list):
-			for item in src:
-				if isinstance(item, str) and item:
-					checks.append({'cmd': 'exists', 'path': item})
-	if cmd in ('delete', 'remove', 'destroy'):
-		path = command.get('path')
-		if isinstance(path, str) and path:
-			checks.append({'cmd': 'exists', 'path': path})
-			checks.append({'cmd': 'inspect', 'path': path})
-	if cmd == 'hover':
-		mat_path = command.get('mat')
-		parent = command.get('parent')
-		if isinstance(mat_path, str) and mat_path:
-			checks.append({'cmd': 'exists', 'path': mat_path})
-			checks.append({'cmd': 'inspect', 'path': mat_path})
-		elif isinstance(parent, str) and parent:
-			checks.append({'cmd': 'exists', 'path': parent})
-			checks.append({'cmd': 'inspect', 'path': parent})
+	if cmd == 'write_framework_json':
+		return checks
+	if cmd == 'replicate_framework':
+		parent = '/project1'
+		checks.append({'cmd': 'exists', 'path': parent})
+		checks.append({'cmd': 'inspect', 'path': parent})
 	return checks
 
 
@@ -402,13 +904,35 @@ def _build_collaboration_payload(messages: list, config: dict, emit=None):
 	base_commands = executor_data.get('commands', [])
 	if not isinstance(base_commands, list) or not base_commands:
 		base_commands = _extract_command_array(executor_raw)
+	base_commands = _normalize_commands(base_commands)
+	validation_issues = _validate_framework_commands(last_user_message, base_commands)
+	if validation_issues:
+		repair_input = (
+			'请修复上一版命令，使其满足用户目标和协议要求。\n'
+			f'用户目标:\n{last_user_message}\n'
+			f'上一版命令:\n{_to_json_text(base_commands)}\n'
+			f'必须修复的问题:\n{_to_json_text(validation_issues)}'
+		)
+		repair_raw, repair_data = _call_agent_json(REPAIR_EXECUTOR_PROMPT, repair_input, config, 60)
+		repaired_commands = repair_data.get('commands', [])
+		if not isinstance(repaired_commands, list) or not repaired_commands:
+			repaired_commands = _extract_command_array(repair_raw)
+		repaired_commands = _normalize_commands(repaired_commands)
+		repaired_issues = _validate_framework_commands(last_user_message, repaired_commands)
+		if repaired_commands and not repaired_issues:
+			base_commands = repaired_commands
+			executor_raw = repair_raw
+			executor_data = repair_data if isinstance(repair_data, dict) else executor_data
+			if not str(executor_data.get('reply') or '').strip():
+				executor_data['reply'] = '已自动修复执行命令，使其满足框架协议与用户目标。'
 	commands = _inject_guard_commands(base_commands)
 	if callable(emit):
 		emit('stage', {
 			'stage': 'executor',
 			'status': 'done',
 			'message': 'Executor 命令生成完成',
-			'commandCount': len(commands)
+			'commandCount': len(commands),
+			'commands': commands
 		})
 	if callable(emit):
 		emit('stage', {'stage': 'reviewer', 'status': 'running', 'message': 'Reviewer 正在审计风险'})
@@ -516,7 +1040,9 @@ class BridgeHandler(BaseHTTPRequestHandler):
 		port = int(data.get('port') or DEFAULT_TD_PORT)
 		timeout_sec = int(data.get('timeout') or DEFAULT_TIMEOUT)
 		try:
-			resp = _send_td_command(cmd, host, port, timeout_sec)
+			resp = _execute_local_command(cmd)
+			if resp is None:
+				resp = _send_td_command(cmd, host, port, timeout_sec)
 			ok = not resp.startswith('error:')
 			return _json_response(self, 200, {'ok': ok, 'response': resp, 'command': cmd})
 		except Exception as exc:
@@ -534,7 +1060,9 @@ class BridgeHandler(BaseHTTPRequestHandler):
 			if not isinstance(cmd, dict):
 				continue
 			try:
-				resp = _send_td_command(cmd, host, port, timeout_sec)
+				resp = _execute_local_command(cmd)
+				if resp is None:
+					resp = _send_td_command(cmd, host, port, timeout_sec)
 				ok = not resp.startswith('error:')
 				item = {'ok': ok, 'response': resp, 'command': cmd}
 				results.append(item)

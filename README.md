@@ -44,7 +44,7 @@
 
 确保 TD 工程目录下有以下关键文件：
 
-- `lib/app.py`：核心能力（创建、参数设置、连线、保存、清理、示例搭建）；
+- `lib/app.py`：核心能力（框架回灌、诊断查询、工程保存、启动基线装载）；
 - `lib/bootstrap.py`：启动初始化与热重载入口；
 - `lib/commands.py`：命令路由；
 - `lib/server_callbacks.py`：TCP/IP DAT 回调；
@@ -71,7 +71,7 @@ bootstrap.init()
 3. `bootstrap.init()` 会做三件事：
    - 把 `project.folder/lib` 加入 `sys.path`；
    - 重载并实例化 `App`；
-   - 若 `lib/config.json` 存在，则自动批量创建节点与连线，并默认让新建节点 Viewer 开启。
+   - 若 `lib/config.json` 存在，则自动装载最小基线网络。
 
 ## 3.3 在 TD 中配置 TCP 服务入口
 
@@ -96,7 +96,7 @@ bootstrap.init()
 
 1. 固化 `lib/config.json` 为项目最小可运行基线；
 2. 每次更新 `lib/*.py` 后，先发送 `reload` 指令；
-3. 再发送业务指令（`create/par/connect/...`）；
+3. 所有结构编辑统一先改写 `OP_Framework` 标准 JSON，再执行 `replicate_framework`；
 4. 每条命令都等待回包再发下一条，保证顺序一致性；
 5. 定期 `save_project` 产出可回滚 `.toe`。
 
@@ -147,78 +147,21 @@ AI 在运行时应遵循：
 4. 根据回包判定成功/失败；
 5. 再发下一条。
 
-## 4.2 创建组件（Create）
+## 4.2 结构编辑唯一入口（OP_Framework）
 
-### 指令
+当前版本对 AI 的**唯一推荐结构编辑方式**是：
 
-```json
-{
-  "cmd": "create",
-  "parent": "/project1",
-  "type": "constantCHOP",
-  "name": "const1",
-  "params": { "value0": 0.5 }
-}
-```
+1. 先读取 `OP_Framework.py` / `OP_Information.py` 导出的 JSON；
+2. AI 仅按 `OP_Framework copy.json` 的树状格式写入目标网络结构；
+3. 再发送 `reload -> replicate_framework -> save_project`。
 
-### AI 执行要点
+这意味着：
 
-- `parent` 必须是已存在路径；
-- `type` 必须是 TD 可识别 OP 类型字符串；
-- `name` 可选，不传则由 TD 默认命名；
-- 若 `params` 提供，创建后立即设置参数。
+- 不再推荐 AI 使用 `create/par/connect/clear/delete` 之类逐条编辑命令；
+- 节点创建、参数修改、连接修改、自定义参数、DAT 内容修改，统一体现在框架 JSON 中；
+- TD 内真正落地时，由 `replicate_framework` 一次性复刻。
 
-## 4.3 修改组件参数（Par）
-
-### 指令
-
-```json
-{
-  "cmd": "par",
-  "path": "/project1/const1",
-  "params": { "value0": 0.8 }
-}
-```
-
-### AI 执行要点
-
-- `path` 必须精确到节点；
-- `params` 可批量设置多个参数；
-- 参数名无效时系统会跳过并打印调试信息，不会自动更名。
-
-## 4.4 组件连线（Connect）
-
-### 指令
-
-```json
-{
-  "cmd": "connect",
-  "dest": "/project1/merge1",
-  "src": ["/project1/const1", "/project1/noise1"]
-}
-```
-
-### AI 执行要点
-
-- 连线按 `src` 数组顺序接入 `dest` 的输入口；
-- 第 1 个 `src` -> input 0，第 2 个 `src` -> input 1；
-- `dest` 或 `src` 任一路径不存在会直接报错。
-
-## 4.5 其他已支持能力
-
-- `clear`：清空父容器下直接子节点；
-- `save_tox`：保存 COMP 为 `.tox`；
-- `save_project`：保存工程 `.toe`；
-- `build_glsl_cube`：一键搭建自转立方体 + hover 联动示例；
-- `hover`：手动写入 `uHover`；
-- `reload`：热重载 `app.py` 并替换单例。
-- `replicate_framework`：按导出的结构化 JSON 完整复刻网络（节点、坐标、参数、连线、DAT 内容、自定义参数页、drawState）。
-- `delete/remove/destroy`：删除指定节点；
-- `exists`：判断路径节点是否存在；
-- `list_children`：列出父容器直接子节点；
-- `inspect`：读取节点类型、父子关系、errors/warnings 等诊断信息。
-
-## 4.6 结构化框架复刻（Replicate Framework）
+## 4.3 结构化框架复刻（Replicate Framework）
 
 ### 指令
 
@@ -239,7 +182,40 @@ AI 在运行时应遵循：
 - 复刻会恢复 `customParameters`（含页面、定义、组参数 `size/components/componentNames`）；
 - 参数模式会恢复 `ParMode`，并处理 `ParMode.BIND` 的 `bindExpr/bindMaster/bindRange`。
 
-## 4.7 查询与诊断（面向分析闭环）
+## 4.4 OP_Framework JSON 写作规则（AI 必须遵循）
+
+顶层必须是数组，每个节点块必须是：
+
+```json
+[
+	{
+		"geo1": {
+			"relPath": "/project1/geo1",
+			"type": "geometryCOMP",
+			"pos": { "x": 0, "y": 0 },
+			"parameters": {},
+			"customParameters": {},
+			"drawState": {},
+			"datContent": {},
+			"connections": {},
+			"children": []
+		}
+	}
+]
+```
+
+AI 写作时必须满足：
+
+- 组件块键名必须是组件名；
+- `children` 必须继续沿用同样结构递归嵌套；
+- 普通参数写入 `parameters -> 页面名 -> 参数名 -> 参数对象`；
+- 自定义参数写入 `customParameters -> 页面名 -> 参数名/组名 -> 参数对象`；
+- `drawState` 用于写 `display/render/template/compare/pickable` 等状态；
+- DAT 组件正文写入 `datContent.full` 或 `datContent.rows`；
+- bind 模式参数不写 `val`，而写 `mode + bind`；
+- 多值自定义参数必须按组输出，不能拆成 `foo1/foo2` 多条。
+
+## 4.5 查询与诊断（面向分析闭环）
 
 ### 查询类指令
 
@@ -259,20 +235,14 @@ AI 在运行时应遵循：
 { "cmd": "project_diagnostics", "root": "/project1", "recursive": true, "include_clean": false, "limit": 500 }
 ```
 
-### 编辑类补充指令
-
-```json
-{ "cmd": "delete", "path": "/project1/someNode" }
-```
-
 ### AI 执行要点
 
 - 在批量编辑前先 `exists/list_children/inspect` 做状态确认，减少盲操作；
 - `inspect` 回包可用于实时收敛错误与警告；
 - `project_diagnostics` 用于抓取工程范围内的错误与警告快照（支持递归与条数限制）；
-- 当用户要求“部分模块编辑”时，优先在目标容器内局部执行，不做全局 `clear`。
+- 当用户要求“部分模块编辑”时，优先先导出当前框架 JSON，再局部修改后回灌，不直接拼装旧式命令。
 
-## 4.8 Web 网关接口（新增，已实现）
+## 4.6 Web 网关接口（新增，已实现）
 
 当前 `tools/web_bridge.py` 暴露以下本地接口：
 
@@ -304,15 +274,11 @@ AI 在运行时应遵循：
 前端底部测试区已封装当前项目高频命令按钮，包括：
 
 - `reload`
-- `build_glsl_cube`
-- `hover`
 - `list_children`
 - `exists`
 - `inspect`
 - `project_diagnostics`
 - `save_project`
-- `clear`
-- `create`
 - `replicate_framework`
 
 ---
@@ -322,11 +288,11 @@ AI 在运行时应遵循：
 为减少误操作，建议 AI 始终按以下策略执行：
 
 1. **先热重载**：会话开始先发 `reload`；
-2. **再变更**：所有网络结构操作按“创建 -> 参数 -> 连线”顺序；
-3. **强校验**：每条命令必须读取回包，若 `error:` 立即停止后续批处理；
-4. **小步提交**：复杂网络分多条命令发，不一次塞过大 JSON；
-5. **可恢复**：关键里程碑后调用 `save_project`；
-6. **最小破坏**：仅在明确需要时才执行 `clear`。
+2. **先回读框架**：先读取 `OP_Framework` / `OP_Information`，不要凭空猜节点结构；
+3. **只改 JSON**：所有结构编辑都先落到 `OP_Framework copy.json`；
+4. **统一回灌**：通过 `replicate_framework` 一次性写回 TD；
+5. **强校验**：回灌前后都做 `exists/list_children/inspect/project_diagnostics`；
+6. **可恢复**：关键里程碑后调用 `save_project`。
 
 ---
 
@@ -340,7 +306,7 @@ AI 在运行时应遵循：
    - `merge1`（mergeCHOP）；
 2. 将 `const1` 和 `noise1` 连接到 `merge1`。
 
-这份配置可作为“启动后自动生成基础网络”的最小模板。
+这份配置仅作为启动期最小模板，不应作为 AI 常规编辑协议。
 
 ---
 
@@ -392,7 +358,7 @@ AI 在运行时应遵循：
 1. TD 启动后自动执行 `bootstrap.init()` 且不报错；
 2. `/project1` 可被创建或复用；
 3. `config.json` 节点与连线可自动落地；
-4. 外部发送 `create/par/connect/reload/replicate_framework` 均有稳定回包；
+4. 外部发送 `reload/replicate_framework/inspect/list_children/project_diagnostics` 均有稳定回包；
 5. 出错时客户端能收到 `error:` 详情；
 6. 能成功执行一次 `save_project` 产出工程文件；
 7. 能通过 `OP_Framework.py` 或 `OP_Information.py` 导出结构化 JSON；
@@ -414,8 +380,8 @@ AI 在运行时应遵循：
    TD 内部网络被抽象为结构化 JSON，外部 Agent 不需要依赖 TD 底层实现细节。
 3. **稳定性细节已沉淀**  
    包括 `inputConnectors` 连线、热重载实例替换、BIND 兼容、BOM 兼容、保存 pickle 风险处理等。
-4. **编辑能力覆盖主路径**  
-   已支持创建、改参、连线、删除、复刻、自定义参数恢复、查询与诊断、工程保存。
+4. **框架回灌能力覆盖主路径**  
+   已支持标准 JSON 复刻、自定义参数恢复、DAT 内容恢复、查询与诊断、工程保存。
 5. **Web 人机交互层已落地**  
    已提供 ChatGPT 风格对话 UI、模型配置与命令测试区，降低非脚本用户的接入门槛。
 6. **思考可视化与流式输出已落地**  
@@ -454,9 +420,9 @@ AI 在运行时应遵循：
 - 全量扫描抑制与摘要化输出策略。  
   状态：**未实现（规划中）**
 
-### 10.3 协议增强：从低层指令到高层技能
+### 10.3 协议增强：从框架协议到高层技能
 
-- 低层命令（create/par/connect/delete/replicate_framework）  
+- 框架协议（OP_Framework + replicate_framework）  
   状态：**已实现**
 - 高层技能（如 `build_feedback_loop`、`build_interactive_particle_system`）  
   状态：**未实现（规划中）**

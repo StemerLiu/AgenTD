@@ -46,6 +46,12 @@
 				</div>
 			</header>
 			<section id="chatMessages" class="messages" aria-live="polite"></section>
+			<section class="command-panel">
+				<details id="commandDetails" class="command-details">
+					<summary id="commandSummary">AI生成命令 JSON（0 条）</summary>
+					<pre id="commandJsonOutput" class="command-json">[]</pre>
+				</details>
+			</section>
 			<footer class="chat-input">
 				<label for="userInput">消息输入</label>
 				<textarea id="userInput" rows="3" placeholder="输入你的目标，例如：在 /project1 下创建两个 CHOP 并连接到 merge1"></textarea>
