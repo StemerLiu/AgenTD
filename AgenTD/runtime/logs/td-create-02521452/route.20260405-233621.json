@@ -1,0 +1,124 @@
+{
+	"type": "route_plan",
+	"created_at": "20260405-233621",
+	"plan": {
+		"orchestrator": {
+			"agent_id": "agent-0-orchestrator",
+			"role": "orchestrator",
+			"consumes": [
+				"user_goal"
+			],
+			"produces": [
+				{
+					"message_type": "task_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+				},
+				{
+					"message_type": "final_report",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/finalReport"
+				}
+			],
+			"routes_to": [
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			]
+		},
+		"task_brief": {
+			"task_id": "td-create-02521452",
+			"task_type": "create",
+			"goal": "创建一个使用 POP 的反馈效果",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "2025.30060 experimental",
+				"allow_experimental": true,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"envelope": {
+			"task_id": "td-create-02521452",
+			"message_id": "td-create-02521452-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-02521452",
+				"task_type": "create",
+				"goal": "创建一个使用 POP 的反馈效果",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "2025.30060 experimental",
+					"allow_experimental": true,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": true,
+				"requires_edit": true,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		"route": [
+			{
+				"agent_id": "agent-1-state-reader",
+				"role": "state_reader",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"project_state_brief"
+				]
+			},
+			{
+				"agent_id": "agent-2-kb-consultant",
+				"role": "kb_consultant",
+				"skill": "touchdesigner-kb-consultant",
+				"produces": [
+					"compatibility_brief"
+				]
+			},
+			{
+				"agent_id": "agent-3-framework-editor",
+				"role": "framework_editor",
+				"skill": "touchdesigner-op-framework-editor",
+				"produces": [
+					"edit_plan_brief",
+					"execution_result"
+				]
+			},
+			{
+				"agent_id": "agent-4-verifier",
+				"role": "verifier",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"validation_brief",
+					"retry_request"
+				]
+			}
+		],
+		"contracts_loaded": [
+			"agent-0-orchestrator",
+			"agent-1-state-reader",
+			"agent-2-kb-consultant",
+			"agent-3-framework-editor",
+			"agent-4-verifier"
+		],
+		"routing_config": {
+			"agent_order": [
+				"agent-0-orchestrator",
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			],
+			"default_scope": "/project1"
+		}
+	}
+}

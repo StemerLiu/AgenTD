@@ -1,0 +1,52 @@
+{
+	"default_priority": "high",
+	"default_scope": "/project1",
+	"agent_order": [
+		"agent-0-orchestrator",
+		"agent-1-state-reader",
+		"agent-2-kb-consultant",
+		"agent-3-framework-editor",
+		"agent-4-verifier"
+	],
+	"task_defaults": {
+		"read": {
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false
+		},
+		"create": {
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true
+		},
+		"modify": {
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": true
+		},
+		"repair": {
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true
+		},
+		"verify": {
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false
+		}
+	},
+	"kb_keywords": [
+		"版本",
+		"兼容",
+		"experimental",
+		"pop",
+		"palette",
+		"python class",
+		"新节点",
+		"家族",
+		"设备",
+		"dmx",
+		"openvr",
+		"touchengine"
+	]
+}

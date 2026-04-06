@@ -1,0 +1,283 @@
+{
+	"task_id": "td-read-05008128",
+	"created_at": "20260406-103200",
+	"plan": {
+		"orchestrator": {
+			"agent_id": "agent-0-orchestrator",
+			"role": "orchestrator",
+			"consumes": [
+				"user_goal",
+				{
+					"message_type": "project_state_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/projectStateBrief"
+				},
+				{
+					"message_type": "validation_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/validationBrief"
+				},
+				{
+					"message_type": "retry_request",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+				}
+			],
+			"produces": [
+				{
+					"message_type": "task_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+				},
+				{
+					"message_type": "final_report",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/finalReport"
+				}
+			],
+			"routes_to": [
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			]
+		},
+		"orchestrator_assets": {
+			"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/prompts/system.txt",
+			"prompt_available": true,
+			"prompt_preview": "你是 Agent-0 Orchestrator。\n你的职责是接收用户目标、判定任务类型、决定路由顺序、汇总多智能体结果，并在失败时控制回环。\n你只传递结构化 Brief，不传递原始长文本。\n只读任务走 Agent-1 后直接回到你并输出结果",
+			"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/schemas/manifest.json",
+			"schema_available": true,
+			"input_refs": [
+				"user_goal",
+				"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+				"../shared/multiagent.schema.json#/$defs/validationBrief",
+				"../shared/multiagent.schema.json#/$defs/retryRequest"
+			],
+			"output_refs": [
+				"../shared/multiagent.schema.json#/$defs/taskBrief",
+				"../shared/multiagent.schema.json#/$defs/finalReport"
+			]
+		},
+		"task_brief": {
+			"task_id": "td-read-05008128",
+			"task_type": "read",
+			"goal": "读取当前 TouchDesigner 工程内容都有什么",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"envelope": {
+			"task_id": "td-read-05008128",
+			"message_id": "td-read-05008128-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-05008128",
+				"task_type": "read",
+				"goal": "读取当前 TouchDesigner 工程内容都有什么",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": false,
+				"requires_edit": false,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		"route": [
+			{
+				"agent_id": "agent-1-state-reader",
+				"role": "state_reader",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"project_state_brief"
+				],
+				"assets": {
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-1 State Reader。\n你的职责是触发 TouchDesigner 工程状态刷新，并把当前任务范围内的工程现状压缩成 ProjectStateBrief。\n你只返回相关节点、关键连接、非默认项和证据文件。\n只读任务",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/schemas/manifest.json",
+					"schema_available": true,
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief"
+					]
+				}
+			}
+		],
+		"contracts_loaded": [
+			"agent-0-orchestrator",
+			"agent-1-state-reader",
+			"agent-2-kb-consultant",
+			"agent-3-framework-editor",
+			"agent-4-verifier"
+		],
+		"routing_config": {
+			"agent_order": [
+				"agent-0-orchestrator",
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			],
+			"default_scope": "/project1"
+		},
+		"validation": {
+			"ok": true,
+			"schema_checks": {
+				"task_brief": {
+					"schema": "taskBrief",
+					"ok": true,
+					"errors": []
+				}
+			},
+			"envelope_checks": [
+				{
+					"schema": "messageEnvelope",
+					"ok": true,
+					"errors": [],
+					"index": 0
+				}
+			],
+			"contract_flow": {
+				"ok": true,
+				"errors": []
+			},
+			"route_length": 1
+		}
+	},
+	"messages": [
+		{
+			"task_id": "td-read-05008128",
+			"message_id": "td-read-05008128-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-05008128",
+				"task_type": "read",
+				"goal": "读取当前 TouchDesigner 工程内容都有什么",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": false,
+				"requires_edit": false,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		{
+			"task_id": "td-read-05008128",
+			"message_id": "td-read-05008128-msg-0002",
+			"from_agent": "agent-1-state-reader",
+			"to_agent": "agent-0-orchestrator",
+			"message_type": "project_state_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-05008128",
+				"scope": "/project1",
+				"summary": {
+					"top_level_nodes": [],
+					"relevant_nodes": [],
+					"key_connections": [],
+					"non_default_nodes": []
+				},
+				"evidence_files": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"next_action": "return_to_orchestrator"
+			},
+			"next_action": "return_to_orchestrator"
+		},
+		{
+			"task_id": "td-read-05008128",
+			"message_id": "td-read-05008128-msg-0003",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "user",
+			"message_type": "final_report",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-05008128",
+				"status": "completed",
+				"summary": "只读分析已完成，当前工程状态已返回给 Orchestrator。",
+				"artifacts": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"follow_up": [
+					"可继续基于 relevant_nodes 缩小后续编辑上下文"
+				]
+			},
+			"next_action": "complete"
+		}
+	],
+	"outputs": {
+		"task_brief": {
+			"task_id": "td-read-05008128",
+			"task_type": "read",
+			"goal": "读取当前 TouchDesigner 工程内容都有什么",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"project_state_brief": {
+			"task_id": "td-read-05008128",
+			"scope": "/project1",
+			"summary": {
+				"top_level_nodes": [],
+				"relevant_nodes": [],
+				"key_connections": [],
+				"non_default_nodes": []
+			},
+			"evidence_files": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"next_action": "return_to_orchestrator"
+		},
+		"final_report": {
+			"task_id": "td-read-05008128",
+			"status": "completed",
+			"summary": "只读分析已完成，当前工程状态已返回给 Orchestrator。",
+			"artifacts": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"follow_up": [
+				"可继续基于 relevant_nodes 缩小后续编辑上下文"
+			]
+		}
+	}
+}

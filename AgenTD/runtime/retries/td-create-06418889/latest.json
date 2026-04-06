@@ -1,0 +1,13 @@
+{
+	"task_id": "td-create-06418889",
+	"created_at": "20260406-125113",
+	"retry_request": {
+		"task_id": "td-create-06418889",
+		"message_type": "retry_request",
+		"failure_type": "compatibility_failure",
+		"failure_summary": "POP",
+		"retry_target": "agent-2-kb-consultant",
+		"suggested_fix": "根据失败类型回到目标 agent，补充兼容性或框架调整后重试。",
+		"next_action": "dispatch_retry_to_agent-2-kb-consultant"
+	}
+}

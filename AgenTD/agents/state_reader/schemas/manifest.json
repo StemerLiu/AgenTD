@@ -1,0 +1,13 @@
+{
+	"agent_id": "agent-1-state-reader",
+	"prompt_file": "../prompts/system.txt",
+	"runtime_exports": {
+		"build_project_state_brief": "build_project_state_brief"
+	},
+	"input_refs": [
+		"../shared/multiagent.schema.json#/$defs/taskBrief"
+	],
+	"output_refs": [
+		"../shared/multiagent.schema.json#/$defs/projectStateBrief"
+	]
+}

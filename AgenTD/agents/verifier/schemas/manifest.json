@@ -1,0 +1,18 @@
+{
+	"agent_id": "agent-4-verifier",
+	"prompt_file": "../prompts/system.txt",
+	"runtime_exports": {
+		"build_validation_state_brief": "build_validation_state_brief",
+		"build_validation_brief": "build_validation_brief",
+		"build_retry_request": "build_retry_request"
+	},
+	"input_refs": [
+		"../shared/multiagent.schema.json#/$defs/taskBrief",
+		"../shared/multiagent.schema.json#/$defs/executionResult"
+	],
+	"output_refs": [
+		"../shared/multiagent.schema.json#/$defs/validationStateBrief",
+		"../shared/multiagent.schema.json#/$defs/validationBrief",
+		"../shared/multiagent.schema.json#/$defs/retryRequest"
+	]
+}

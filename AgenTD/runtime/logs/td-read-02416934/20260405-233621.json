@@ -1,0 +1,287 @@
+{
+	"task_id": "td-read-02416934",
+	"created_at": "20260405-233621",
+	"plan": {
+		"orchestrator": {
+			"agent_id": "agent-0-orchestrator",
+			"role": "orchestrator",
+			"consumes": [
+				"user_goal"
+			],
+			"produces": [
+				{
+					"message_type": "task_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+				},
+				{
+					"message_type": "final_report",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/finalReport"
+				}
+			],
+			"routes_to": [
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			]
+		},
+		"task_brief": {
+			"task_id": "td-read-02416934",
+			"task_type": "read",
+			"goal": "读取当前 TouchDesigner 工程内容",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"envelope": {
+			"task_id": "td-read-02416934",
+			"message_id": "td-read-02416934-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-02416934",
+				"task_type": "read",
+				"goal": "读取当前 TouchDesigner 工程内容",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": false,
+				"requires_edit": false,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		"route": [
+			{
+				"agent_id": "agent-1-state-reader",
+				"role": "state_reader",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"project_state_brief"
+				]
+			}
+		],
+		"contracts_loaded": [
+			"agent-0-orchestrator",
+			"agent-1-state-reader",
+			"agent-2-kb-consultant",
+			"agent-3-framework-editor",
+			"agent-4-verifier"
+		],
+		"routing_config": {
+			"agent_order": [
+				"agent-0-orchestrator",
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			],
+			"default_scope": "/project1"
+		}
+	},
+	"messages": [
+		{
+			"task_id": "td-read-02416934",
+			"message_id": "td-read-02416934-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-02416934",
+				"task_type": "read",
+				"goal": "读取当前 TouchDesigner 工程内容",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": false,
+				"requires_edit": false,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		{
+			"task_id": "td-read-02416934",
+			"message_id": "td-read-02416934-msg-0002",
+			"from_agent": "agent-1-state-reader",
+			"to_agent": "agent-4-verifier",
+			"message_type": "project_state_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-02416934",
+				"scope": "/project1",
+				"summary": {
+					"top_level_nodes": [
+						{
+							"name": "examine1",
+							"path": "/project1/examine1",
+							"type": "examineDAT"
+						}
+					],
+					"relevant_nodes": [],
+					"key_connections": [],
+					"non_default_nodes": [
+						"test_container8 | baseCOMP | /project1/test_container8"
+					]
+				},
+				"evidence_files": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"next_action": "dispatch_to_agent_4"
+			},
+			"next_action": "dispatch_to_agent_4"
+		},
+		{
+			"task_id": "td-read-02416934",
+			"message_id": "td-read-02416934-msg-0003",
+			"from_agent": "agent-1-state-reader",
+			"to_agent": "agent-4-verifier",
+			"message_type": "execution_result",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-02416934",
+				"status": "executed",
+				"executed_commands": [],
+				"runtime_notes": [
+					"当前任务不需要编辑执行"
+				],
+				"next_action": "dispatch_to_agent_4"
+			},
+			"next_action": "dispatch_to_agent_4"
+		},
+		{
+			"task_id": "td-read-02416934",
+			"message_id": "td-read-02416934-msg-0004",
+			"from_agent": "agent-4-verifier",
+			"to_agent": "agent-0-orchestrator",
+			"message_type": "validation_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-02416934",
+				"status": "pass",
+				"result_type": "goal_match",
+				"verified_changes": [],
+				"remaining_issues": [],
+				"retry_target": "",
+				"next_action": "return_to_orchestrator"
+			},
+			"next_action": "return_to_orchestrator"
+		},
+		{
+			"task_id": "td-read-02416934",
+			"message_id": "td-read-02416934-msg-0005",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "user",
+			"message_type": "final_report",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-read-02416934",
+				"status": "completed",
+				"summary": "多智能体最小执行流已完成",
+				"artifacts": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"follow_up": []
+			},
+			"next_action": "complete"
+		}
+	],
+	"outputs": {
+		"task_brief": {
+			"task_id": "td-read-02416934",
+			"task_type": "read",
+			"goal": "读取当前 TouchDesigner 工程内容",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"project_state_brief": {
+			"task_id": "td-read-02416934",
+			"scope": "/project1",
+			"summary": {
+				"top_level_nodes": [
+					{
+						"name": "examine1",
+						"path": "/project1/examine1",
+						"type": "examineDAT"
+					}
+				],
+				"relevant_nodes": [],
+				"key_connections": [],
+				"non_default_nodes": [
+					"test_container8 | baseCOMP | /project1/test_container8"
+				]
+			},
+			"evidence_files": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"next_action": "dispatch_to_agent_4"
+		},
+		"execution_result": {
+			"task_id": "td-read-02416934",
+			"status": "executed",
+			"executed_commands": [],
+			"runtime_notes": [
+				"当前任务不需要编辑执行"
+			],
+			"next_action": "dispatch_to_agent_4"
+		},
+		"runtime_commands": [],
+		"validation_brief": {
+			"task_id": "td-read-02416934",
+			"status": "pass",
+			"result_type": "goal_match",
+			"verified_changes": [],
+			"remaining_issues": [],
+			"retry_target": "",
+			"next_action": "return_to_orchestrator"
+		},
+		"final_report": {
+			"task_id": "td-read-02416934",
+			"status": "completed",
+			"summary": "多智能体最小执行流已完成",
+			"artifacts": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"follow_up": []
+		}
+	}
+}

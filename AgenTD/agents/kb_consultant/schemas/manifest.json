@@ -1,0 +1,17 @@
+{
+	"agent_id": "agent-2-kb-consultant",
+	"prompt_file": "../prompts/system.txt",
+	"runtime_exports": {
+		"build_compatibility_brief": "build_compatibility_brief",
+		"build_retry_compatibility_brief": "build_retry_compatibility_brief"
+	},
+	"input_refs": [
+		"../shared/multiagent.schema.json#/$defs/taskBrief",
+		"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+		"../shared/multiagent.schema.json#/$defs/candidatePlan",
+		"../shared/multiagent.schema.json#/$defs/retryRequest"
+	],
+	"output_refs": [
+		"../shared/multiagent.schema.json#/$defs/compatibilityBrief"
+	]
+}

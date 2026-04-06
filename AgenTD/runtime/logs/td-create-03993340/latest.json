@@ -1,0 +1,905 @@
+{
+	"task_id": "td-create-03993340",
+	"created_at": "20260406-114218",
+	"plan": {
+		"orchestrator": {
+			"agent_id": "agent-0-orchestrator",
+			"role": "orchestrator",
+			"consumes": [
+				"user_goal",
+				{
+					"message_type": "project_state_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/projectStateBrief"
+				},
+				{
+					"message_type": "validation_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/validationBrief"
+				},
+				{
+					"message_type": "retry_request",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+				}
+			],
+			"produces": [
+				{
+					"message_type": "task_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+				},
+				{
+					"message_type": "candidate_plan",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/candidatePlan"
+				},
+				{
+					"message_type": "final_report",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/finalReport"
+				}
+			],
+			"routes_to": [
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			]
+		},
+		"orchestrator_assets": {
+			"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator",
+			"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/prompts/system.txt",
+			"prompt_available": true,
+			"prompt_preview": "你是 Agent-0 Orchestrator。\n你的职责是接收用户目标、判定任务类型、决定路由顺序、汇总多智能体结果，并在失败时控制回环。\n你只传递结构化 Brief，不传递原始长文本。\n只读任务走 Agent-1 后直接回到你并输出结果",
+			"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/schemas/manifest.json",
+			"schema_available": true,
+			"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/runtime.py",
+			"runtime_available": true,
+			"runtime_exports": {
+				"build_task_brief": "build_task_brief",
+				"build_final_report": "build_final_report",
+				"build_read_only_final_report": "build_read_only_final_report",
+				"build_agent_envelope": "build_agent_envelope",
+				"decide_next_agent_after_state": "decide_next_agent_after_state",
+				"decide_next_agent_after_compatibility": "decide_next_agent_after_compatibility",
+				"build_fallback_state_brief": "build_fallback_state_brief",
+				"build_default_edit_plan_brief": "build_default_edit_plan_brief",
+				"build_default_compatibility_brief": "build_default_compatibility_brief",
+				"build_execution_state": "build_execution_state",
+				"build_runtime_payload": "build_runtime_payload",
+				"decide_execution_result_source_agent": "decide_execution_result_source_agent",
+				"build_route_agent_ids": "build_route_agent_ids",
+				"build_candidate_plan": "build_candidate_plan"
+			},
+			"input_refs": [
+				"user_goal",
+				"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+				"../shared/multiagent.schema.json#/$defs/validationBrief",
+				"../shared/multiagent.schema.json#/$defs/retryRequest"
+			],
+			"output_refs": [
+				"../shared/multiagent.schema.json#/$defs/taskBrief",
+				"../shared/multiagent.schema.json#/$defs/candidatePlan",
+				"../shared/multiagent.schema.json#/$defs/finalReport"
+			]
+		},
+		"task_brief": {
+			"task_id": "td-create-03993340",
+			"task_type": "create",
+			"goal": "创建一个新的 container 作为测试节点",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"envelope": {
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"task_type": "create",
+				"goal": "创建一个新的 container 作为测试节点",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": true,
+				"requires_edit": true,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		"route": [
+			{
+				"agent_id": "agent-1-state-reader",
+				"role": "state_reader",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"project_state_brief"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-1 State Reader。\n你的职责是触发 TouchDesigner 工程状态刷新，并把当前任务范围内的工程现状压缩成 ProjectStateBrief。\n你只返回相关节点、关键连接、非默认项和证据文件。\n只读任务",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_project_state_brief": "build_project_state_brief"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief"
+					]
+				}
+			},
+			{
+				"agent_id": "agent-2-kb-consultant",
+				"role": "kb_consultant",
+				"skill": "touchdesigner-kb-consultant",
+				"produces": [
+					"compatibility_brief"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-2 KB Consultant。\n你的职责是在创建、修复或存在版本风险时，基于 TouchDesigner 知识库做家族兼容性与节点选型判断。\n你输出 CompatibilityBrief，只保留兼容项、拒绝项、证据和推荐",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_compatibility_brief": "build_compatibility_brief",
+						"build_retry_compatibility_brief": "build_retry_compatibility_brief"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+						"../shared/multiagent.schema.json#/$defs/candidatePlan",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/compatibilityBrief"
+					]
+				}
+			},
+			{
+				"agent_id": "agent-3-framework-editor",
+				"role": "framework_editor",
+				"skill": "touchdesigner-op-framework-editor",
+				"produces": [
+					"edit_plan_brief",
+					"execution_result"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-3 Framework Editor。\n你的职责是把用户目标和前序 Brief 转成最小可执行的 OP_Framework 编辑计划。\n你输出 EditPlanBrief，并在需要时给出执行链路和风险点。\n如果回退请求指向",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_edit_plan_brief": "build_edit_plan_brief",
+						"build_execution_result": "build_execution_result",
+						"build_retry_edit_plan_brief": "build_retry_edit_plan_brief"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+						"../shared/multiagent.schema.json#/$defs/compatibilityBrief",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/editPlanBrief",
+						"../shared/multiagent.schema.json#/$defs/executionResult"
+					]
+				}
+			},
+			{
+				"agent_id": "agent-4-verifier",
+				"role": "verifier",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"validation_brief",
+					"retry_request"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-4 Verifier。\n你的职责是基于执行结果和最新工程状态，判断目标是否达成，并把结果压缩成 ValidationBrief。\n如果验证失败，你不直接修改工程，而是输出 retry_request。\n兼容性问题回 Age",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_validation_state_brief": "build_validation_state_brief",
+						"build_validation_brief": "build_validation_brief",
+						"build_retry_request": "build_retry_request"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/executionResult"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/validationStateBrief",
+						"../shared/multiagent.schema.json#/$defs/validationBrief",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					]
+				}
+			}
+		],
+		"contracts_loaded": [
+			"agent-0-orchestrator",
+			"agent-1-state-reader",
+			"agent-2-kb-consultant",
+			"agent-3-framework-editor",
+			"agent-4-verifier"
+		],
+		"agent_registry": {
+			"agent-0-orchestrator": {
+				"role": "orchestrator",
+				"skill": "",
+				"produces": [
+					"task_brief",
+					"candidate_plan",
+					"final_report"
+				],
+				"consumes": [
+					"user_goal",
+					"project_state_brief",
+					"validation_brief",
+					"retry_request"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-0 Orchestrator。\n你的职责是接收用户目标、判定任务类型、决定路由顺序、汇总多智能体结果，并在失败时控制回环。\n你只传递结构化 Brief，不传递原始长文本。\n只读任务走 Agent-1 后直接回到你并输出结果",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/orchestrator/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_task_brief": "build_task_brief",
+						"build_final_report": "build_final_report",
+						"build_read_only_final_report": "build_read_only_final_report",
+						"build_agent_envelope": "build_agent_envelope",
+						"decide_next_agent_after_state": "decide_next_agent_after_state",
+						"decide_next_agent_after_compatibility": "decide_next_agent_after_compatibility",
+						"build_fallback_state_brief": "build_fallback_state_brief",
+						"build_default_edit_plan_brief": "build_default_edit_plan_brief",
+						"build_default_compatibility_brief": "build_default_compatibility_brief",
+						"build_execution_state": "build_execution_state",
+						"build_runtime_payload": "build_runtime_payload",
+						"decide_execution_result_source_agent": "decide_execution_result_source_agent",
+						"build_route_agent_ids": "build_route_agent_ids",
+						"build_candidate_plan": "build_candidate_plan"
+					},
+					"input_refs": [
+						"user_goal",
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+						"../shared/multiagent.schema.json#/$defs/validationBrief",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/candidatePlan",
+						"../shared/multiagent.schema.json#/$defs/finalReport"
+					]
+				}
+			},
+			"agent-1-state-reader": {
+				"role": "state_reader",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"project_state_brief"
+				],
+				"consumes": [
+					"task_brief"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-1 State Reader。\n你的职责是触发 TouchDesigner 工程状态刷新，并把当前任务范围内的工程现状压缩成 ProjectStateBrief。\n你只返回相关节点、关键连接、非默认项和证据文件。\n只读任务",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/state_reader/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_project_state_brief": "build_project_state_brief"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief"
+					]
+				}
+			},
+			"agent-2-kb-consultant": {
+				"role": "kb_consultant",
+				"skill": "touchdesigner-kb-consultant",
+				"produces": [
+					"compatibility_brief"
+				],
+				"consumes": [
+					"task_brief",
+					"project_state_brief",
+					"candidate_plan",
+					"retry_request"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-2 KB Consultant。\n你的职责是在创建、修复或存在版本风险时，基于 TouchDesigner 知识库做家族兼容性与节点选型判断。\n你输出 CompatibilityBrief，只保留兼容项、拒绝项、证据和推荐",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/kb_consultant/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_compatibility_brief": "build_compatibility_brief",
+						"build_retry_compatibility_brief": "build_retry_compatibility_brief"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+						"../shared/multiagent.schema.json#/$defs/candidatePlan",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/compatibilityBrief"
+					]
+				}
+			},
+			"agent-3-framework-editor": {
+				"role": "framework_editor",
+				"skill": "touchdesigner-op-framework-editor",
+				"produces": [
+					"edit_plan_brief",
+					"execution_result"
+				],
+				"consumes": [
+					"task_brief",
+					"project_state_brief",
+					"compatibility_brief",
+					"retry_request"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-3 Framework Editor。\n你的职责是把用户目标和前序 Brief 转成最小可执行的 OP_Framework 编辑计划。\n你输出 EditPlanBrief，并在需要时给出执行链路和风险点。\n如果回退请求指向",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/framework_editor/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_edit_plan_brief": "build_edit_plan_brief",
+						"build_execution_result": "build_execution_result",
+						"build_retry_edit_plan_brief": "build_retry_edit_plan_brief"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+						"../shared/multiagent.schema.json#/$defs/compatibilityBrief",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/editPlanBrief",
+						"../shared/multiagent.schema.json#/$defs/executionResult"
+					]
+				}
+			},
+			"agent-4-verifier": {
+				"role": "verifier",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"validation_brief",
+					"retry_request"
+				],
+				"consumes": [
+					"task_brief",
+					"execution_result"
+				],
+				"assets": {
+					"agent_dir": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier",
+					"prompt_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier/prompts/system.txt",
+					"prompt_available": true,
+					"prompt_preview": "你是 Agent-4 Verifier。\n你的职责是基于执行结果和最新工程状态，判断目标是否达成，并把结果压缩成 ValidationBrief。\n如果验证失败，你不直接修改工程，而是输出 retry_request。\n兼容性问题回 Age",
+					"schema_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier/schemas/manifest.json",
+					"schema_available": true,
+					"runtime_file": "/Users/stemerliu/Documents/SuperLib/TD自动化/AgenTD/agents/verifier/runtime.py",
+					"runtime_available": true,
+					"runtime_exports": {
+						"build_validation_state_brief": "build_validation_state_brief",
+						"build_validation_brief": "build_validation_brief",
+						"build_retry_request": "build_retry_request"
+					},
+					"input_refs": [
+						"../shared/multiagent.schema.json#/$defs/taskBrief",
+						"../shared/multiagent.schema.json#/$defs/executionResult"
+					],
+					"output_refs": [
+						"../shared/multiagent.schema.json#/$defs/validationStateBrief",
+						"../shared/multiagent.schema.json#/$defs/validationBrief",
+						"../shared/multiagent.schema.json#/$defs/retryRequest"
+					]
+				}
+			}
+		},
+		"routing_config": {
+			"agent_order": [
+				"agent-0-orchestrator",
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			],
+			"default_scope": "/project1"
+		},
+		"validation": {
+			"ok": true,
+			"schema_checks": {
+				"task_brief": {
+					"schema": "taskBrief",
+					"ok": true,
+					"errors": []
+				}
+			},
+			"envelope_checks": [
+				{
+					"schema": "messageEnvelope",
+					"ok": true,
+					"errors": [],
+					"index": 0
+				}
+			],
+			"contract_flow": {
+				"ok": true,
+				"errors": []
+			},
+			"route_length": 4
+		}
+	},
+	"messages": [
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"task_type": "create",
+				"goal": "创建一个新的 container 作为测试节点",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": true,
+				"requires_edit": true,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0002",
+			"from_agent": "agent-1-state-reader",
+			"to_agent": "agent-2-kb-consultant",
+			"message_type": "project_state_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"scope": "/project1",
+				"summary": {
+					"top_level_nodes": [],
+					"relevant_nodes": [],
+					"key_connections": [],
+					"non_default_nodes": []
+				},
+				"evidence_files": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"next_action": "dispatch_to_agent_2"
+			},
+			"next_action": "dispatch_to_agent_2"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0003",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-2-kb-consultant",
+			"message_type": "candidate_plan",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"scope": "/project1",
+				"goal": "创建一个新的 container 作为测试节点",
+				"candidate_nodes": [],
+				"candidate_families": [],
+				"strategy": "当前扫描未命中明显候选节点，优先按目标描述推断候选家族",
+				"next_action": "dispatch_to_agent_2"
+			},
+			"next_action": "dispatch_to_agent_2"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0004",
+			"from_agent": "agent-2-kb-consultant",
+			"to_agent": "agent-3-framework-editor",
+			"message_type": "compatibility_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"scope": "/project1",
+				"version_assumption": "current_project_runtime",
+				"compatible_choices": [],
+				"rejected_choices": [],
+				"evidence": [],
+				"recommendation": "当前目标未命中需要知识库拦截的明确 OP 家族，可按现有扫描结果继续。",
+				"next_action": "dispatch_to_agent_3"
+			},
+			"next_action": "dispatch_to_agent_3"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0005",
+			"from_agent": "agent-3-framework-editor",
+			"to_agent": "agent-4-verifier",
+			"message_type": "execution_result",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"status": "failed",
+				"executed_commands": [
+					"write_framework_json",
+					"reload"
+				],
+				"runtime_notes": [
+					"write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0",
+					"[Errno 61] Connection refused"
+				],
+				"next_action": "dispatch_to_agent_4"
+			},
+			"next_action": "dispatch_to_agent_4"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0006",
+			"from_agent": "agent-4-verifier",
+			"to_agent": "agent-0-orchestrator",
+			"message_type": "validation_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"status": "fail",
+				"result_type": "execution_failure",
+				"verified_changes": [
+					"write_framework_json",
+					"reload"
+				],
+				"remaining_issues": [
+					"write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0",
+					"[Errno 61] Connection refused"
+				],
+				"retry_target": "agent-3-framework-editor",
+				"next_action": "dispatch_retry_to_agent_3"
+			},
+			"next_action": "dispatch_retry_to_agent_3"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0007",
+			"from_agent": "agent-4-verifier",
+			"to_agent": "agent-3-framework-editor",
+			"message_type": "retry_request",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"message_type": "retry_request",
+				"failure_type": "execution_failure",
+				"failure_summary": "write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused",
+				"retry_target": "agent-3-framework-editor",
+				"suggested_fix": "根据失败类型回到目标 agent，补充兼容性或框架调整后重试。",
+				"next_action": "dispatch_retry_to_agent-3-framework-editor"
+			},
+			"next_action": "dispatch_retry_to_agent-3-framework-editor"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0008",
+			"from_agent": "agent-3-framework-editor",
+			"to_agent": "agent-4-verifier",
+			"message_type": "execution_result",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"status": "failed",
+				"executed_commands": [
+					"write_framework_json",
+					"reload"
+				],
+				"runtime_notes": [
+					"write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0",
+					"[Errno 61] Connection refused"
+				],
+				"next_action": "dispatch_to_agent_4"
+			},
+			"next_action": "dispatch_to_agent_4"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0009",
+			"from_agent": "agent-4-verifier",
+			"to_agent": "agent-0-orchestrator",
+			"message_type": "validation_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"status": "fail",
+				"result_type": "execution_failure",
+				"verified_changes": [
+					"write_framework_json",
+					"reload"
+				],
+				"remaining_issues": [
+					"write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0",
+					"[Errno 61] Connection refused"
+				],
+				"retry_target": "agent-3-framework-editor",
+				"next_action": "dispatch_retry_to_agent_3"
+			},
+			"next_action": "dispatch_retry_to_agent_3"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0010",
+			"from_agent": "agent-4-verifier",
+			"to_agent": "agent-3-framework-editor",
+			"message_type": "retry_request",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"message_type": "retry_request",
+				"failure_type": "execution_failure",
+				"failure_summary": "write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused",
+				"retry_target": "agent-3-framework-editor",
+				"suggested_fix": "根据失败类型回到目标 agent，补充兼容性或框架调整后重试。",
+				"next_action": "dispatch_retry_to_agent-3-framework-editor"
+			},
+			"next_action": "dispatch_retry_to_agent-3-framework-editor"
+		},
+		{
+			"task_id": "td-create-03993340",
+			"message_id": "td-create-03993340-msg-0011",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "user",
+			"message_type": "final_report",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-03993340",
+				"status": "failed",
+				"summary": "多智能体最小执行流完成，但存在需要回退的失败项",
+				"artifacts": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"follow_up": [
+					"重试目标: agent-3-framework-editor",
+					"失败摘要: write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused"
+				]
+			},
+			"next_action": "complete"
+		}
+	],
+	"outputs": {
+		"task_brief": {
+			"task_id": "td-create-03993340",
+			"task_type": "create",
+			"goal": "创建一个新的 container 作为测试节点",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"project_state_brief": {
+			"task_id": "td-create-03993340",
+			"scope": "/project1",
+			"summary": {
+				"top_level_nodes": [],
+				"relevant_nodes": [],
+				"key_connections": [],
+				"non_default_nodes": []
+			},
+			"evidence_files": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"next_action": "dispatch_to_agent_2"
+		},
+		"candidate_plan": {
+			"task_id": "td-create-03993340",
+			"scope": "/project1",
+			"goal": "创建一个新的 container 作为测试节点",
+			"candidate_nodes": [],
+			"candidate_families": [],
+			"strategy": "当前扫描未命中明显候选节点，优先按目标描述推断候选家族",
+			"next_action": "dispatch_to_agent_2"
+		},
+		"compatibility_brief": {
+			"task_id": "td-create-03993340",
+			"scope": "/project1",
+			"version_assumption": "current_project_runtime",
+			"compatible_choices": [],
+			"rejected_choices": [],
+			"evidence": [],
+			"recommendation": "当前目标未命中需要知识库拦截的明确 OP 家族，可按现有扫描结果继续。",
+			"next_action": "dispatch_to_agent_3"
+		},
+		"edit_plan_brief": {
+			"task_id": "td-create-03993340",
+			"scope": "/project1",
+			"edit_goal": "创建一个新的 container 作为测试节点",
+			"framework_changes": [
+				{
+					"path": "/project1",
+					"type": "baseCOMP",
+					"action": "create"
+				}
+			],
+			"execution_chain": [
+				"write_framework_json",
+				"reload",
+				"replicate_framework",
+				"save_project"
+			],
+			"risk_points": [
+				"扫描结果中没有明显命中目标的相关节点",
+				"重试原因: write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused",
+				"修复建议: 根据失败类型回到目标 agent，补充兼容性或框架调整后重试。"
+			],
+			"next_action": "dispatch_to_agent_4"
+		},
+		"execution_result": {
+			"task_id": "td-create-03993340",
+			"status": "failed",
+			"executed_commands": [
+				"write_framework_json",
+				"reload"
+			],
+			"runtime_notes": [
+				"write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0",
+				"[Errno 61] Connection refused"
+			],
+			"next_action": "dispatch_to_agent_4"
+		},
+		"runtime_commands": [
+			{
+				"cmd": "write_framework_json",
+				"file": "OP_Framework.json",
+				"forest": []
+			},
+			{
+				"cmd": "reload"
+			},
+			{
+				"cmd": "replicate_framework",
+				"file": "OP_Framework.json",
+				"clear_parent": false
+			},
+			{
+				"cmd": "save_project"
+			}
+		],
+		"validation_state_brief": {
+			"task_id": "td-create-03993340",
+			"scope": "/project1",
+			"summary": {
+				"top_level_nodes": [],
+				"relevant_nodes": [],
+				"key_connections": [],
+				"non_default_nodes": []
+			},
+			"evidence_files": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"executed_commands": [
+				"write_framework_json",
+				"reload"
+			],
+			"next_action": "return_to_verifier"
+		},
+		"validation_brief": {
+			"task_id": "td-create-03993340",
+			"status": "fail",
+			"result_type": "execution_failure",
+			"verified_changes": [
+				"write_framework_json",
+				"reload"
+			],
+			"remaining_issues": [
+				"write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0",
+				"[Errno 61] Connection refused"
+			],
+			"retry_target": "agent-3-framework-editor",
+			"next_action": "dispatch_retry_to_agent_3"
+		},
+		"retry_request": {
+			"task_id": "td-create-03993340",
+			"message_type": "retry_request",
+			"failure_type": "execution_failure",
+			"failure_summary": "write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused",
+			"retry_target": "agent-3-framework-editor",
+			"suggested_fix": "根据失败类型回到目标 agent，补充兼容性或框架调整后重试。",
+			"next_action": "dispatch_retry_to_agent-3-framework-editor"
+		},
+		"retry_history": [
+			{
+				"retry_target": "agent-3-framework-editor",
+				"failure_type": "execution_failure",
+				"failure_summary": "write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused"
+			}
+		],
+		"auto_retry_count": 1,
+		"final_report": {
+			"task_id": "td-create-03993340",
+			"status": "failed",
+			"summary": "多智能体最小执行流完成，但存在需要回退的失败项",
+			"artifacts": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"follow_up": [
+				"重试目标: agent-3-framework-editor",
+				"失败摘要: write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused"
+			]
+		}
+	}
+}

@@ -1,0 +1,386 @@
+:root {
+	color-scheme: dark;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: #0b1020;
+	color: #eaf0ff;
+}
+
+.app-shell {
+	display: grid;
+	grid-template-columns: 360px 1fr;
+	gap: 12px;
+	padding: 12px;
+	height: calc(100vh - 220px);
+}
+
+.left-panel,
+.chat-panel,
+.tester {
+	background: #121a2e;
+	border: 1px solid #26314f;
+	border-radius: 12px;
+}
+
+.left-panel {
+	padding: 14px;
+	overflow: auto;
+}
+
+h1 {
+	font-size: 18px;
+	margin: 0 0 12px 0;
+}
+
+h2 {
+	font-size: 14px;
+	margin: 0 0 8px 0;
+}
+
+.section {
+	border-top: 1px solid #273459;
+	padding-top: 12px;
+	margin-top: 12px;
+}
+
+.provider-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 10px;
+	border-radius: 999px;
+	background: #10264b;
+	border: 1px solid #2e5db6;
+	color: #cfe0ff;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+label {
+	display: block;
+	font-size: 12px;
+	margin: 6px 0 4px;
+	color: #9eb2df;
+}
+
+input,
+select,
+textarea,
+button {
+	width: 100%;
+	border-radius: 8px;
+	border: 1px solid #3a4a73;
+	background: #0f1730;
+	color: #f2f6ff;
+	padding: 9px 10px;
+	font-size: 13px;
+}
+
+textarea {
+	resize: vertical;
+}
+
+button {
+	cursor: pointer;
+	background: #2d5bff;
+	border-color: #2d5bff;
+	font-weight: 600;
+}
+
+button.secondary {
+	background: #1a2547;
+	border-color: #385098;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 2px solid #7da2ff;
+	outline-offset: 1px;
+}
+
+.row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.status {
+	min-height: 18px;
+	font-size: 12px;
+	margin-top: 8px;
+	color: #b8caef;
+}
+
+.chat-panel {
+	display: grid;
+	grid-template-rows: auto 1fr auto auto;
+}
+
+.chat-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	border-bottom: 1px solid #26314f;
+}
+
+.actions {
+	display: flex;
+	gap: 8px;
+}
+
+.actions button {
+	width: auto;
+}
+
+.messages {
+	padding: 12px;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.msg {
+	max-width: 84%;
+	padding: 10px 12px;
+	border-radius: 12px;
+	white-space: pre-wrap;
+	line-height: 1.4;
+}
+
+.msg.user {
+	align-self: flex-end;
+	background: #2a57f0;
+}
+
+.msg.ai {
+	align-self: flex-start;
+	background: #1b2748;
+}
+
+.msg.agent {
+	align-self: flex-start;
+	background: #132a2a;
+	border: 1px solid #2a6b6b;
+}
+
+.workflow-panel {
+	padding: 12px;
+	border-bottom: 1px solid #26314f;
+	background: linear-gradient(180deg, #101930 0%, #0f1730 100%);
+}
+
+.workflow-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.workflow-meta {
+	font-size: 12px;
+	color: #91a7da;
+	white-space: nowrap;
+}
+
+.workflow-graph {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+	gap: 8px;
+	align-items: center;
+}
+
+.workflow-card {
+	min-height: 156px;
+	padding: 12px;
+	border-radius: 12px;
+	border: 1px solid #32446e;
+	background: #111b34;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.workflow-card.idle {
+	opacity: 0.75;
+}
+
+.workflow-card.running {
+	border-color: #6d8dff;
+	box-shadow: 0 0 0 1px rgba(109, 141, 255, 0.35) inset;
+}
+
+.workflow-card.done {
+	border-color: #3e8d72;
+	background: #12243b;
+}
+
+.workflow-card.partial {
+	border-color: #ba8b3b;
+	background: #241d12;
+}
+
+.workflow-card h3 {
+	margin: 0;
+	font-size: 14px;
+}
+
+.workflow-hint,
+.workflow-card-status,
+.workflow-card-summary {
+	font-size: 12px;
+	color: #bfd0f8;
+	line-height: 1.5;
+}
+
+.workflow-card-summary {
+	color: #edf3ff;
+}
+
+.workflow-arrow {
+	font-size: 22px;
+	color: #6f86be;
+	text-align: center;
+}
+
+.workflow-metrics {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: auto;
+}
+
+.workflow-metric {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 8px;
+	border-radius: 999px;
+	background: #0d1429;
+	border: 1px solid #31456f;
+	font-size: 11px;
+	color: #d9e5ff;
+}
+
+.workflow-timeline {
+	margin-top: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.workflow-event,
+.workflow-timeline-empty {
+	padding: 8px 10px;
+	border-radius: 8px;
+	background: #0d1429;
+	border: 1px solid #28385e;
+	font-size: 12px;
+	color: #c7d7fb;
+}
+
+.chat-input {
+	padding: 12px;
+	border-top: 1px solid #26314f;
+}
+
+.command-panel {
+	border-top: 1px solid #26314f;
+	padding: 10px 12px;
+	background: #10182d;
+}
+
+.command-details {
+	border: 1px solid #2b3960;
+	border-radius: 10px;
+	background: #0c1430;
+	padding: 8px 10px;
+}
+
+.command-details summary {
+	cursor: pointer;
+	color: #c9d8ff;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.command-json {
+	margin: 10px 0 0;
+	background: #091022;
+	border: 1px solid #24345e;
+	border-radius: 8px;
+	padding: 10px;
+	max-height: 220px;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.tester {
+	margin: 0 12px 12px;
+	padding: 10px;
+}
+
+.tester-toggle {
+	width: auto;
+}
+
+.tester-body.hidden {
+	display: none;
+}
+
+.quick-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.quick-grid button {
+	background: #1a2547;
+	border-color: #3e538f;
+}
+
+.json-editor {
+	margin-top: 14px;
+}
+
+.json-editor h3 {
+	margin: 0 0 8px 0;
+	font-size: 14px;
+}
+
+.output {
+	margin-top: 10px;
+	background: #0a1127;
+	border: 1px solid #26314f;
+	border-radius: 8px;
+	padding: 10px;
+	max-height: 200px;
+	overflow: auto;
+}
+
+@media (max-width: 980px) {
+	.app-shell {
+		grid-template-columns: 1fr;
+		height: auto;
+	}
+
+	.workflow-graph {
+		grid-template-columns: 1fr;
+	}
+
+	.workflow-arrow {
+		transform: rotate(90deg);
+	}
+}

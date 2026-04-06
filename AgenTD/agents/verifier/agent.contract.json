@@ -1,0 +1,30 @@
+{
+	"agent_id": "agent-4-verifier",
+	"role": "verifier",
+	"skill": "touchdesigner-project-state-reader",
+	"consumes": [
+		{
+			"message_type": "task_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+		},
+		{
+			"message_type": "execution_result",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/executionResult"
+		}
+	],
+	"produces": [
+		{
+			"message_type": "validation_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/validationBrief"
+		},
+		{
+			"message_type": "retry_request",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+		}
+	],
+	"routes_to": [
+		"agent-0-orchestrator",
+		"agent-2-kb-consultant",
+		"agent-3-framework-editor"
+	]
+}

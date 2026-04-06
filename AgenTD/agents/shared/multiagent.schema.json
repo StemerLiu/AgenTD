@@ -1,0 +1,592 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://agentd.local/schemas/multiagent.schema.json",
+	"title": "AgenTD Multiagent Schemas",
+	"type": "object",
+	"$defs": {
+		"priority": {
+			"type": "string",
+			"enum": ["high", "medium", "low"]
+		},
+		"messageType": {
+			"type": "string",
+			"enum": [
+				"task_brief",
+				"project_state_brief",
+				"candidate_plan",
+				"compatibility_brief",
+				"edit_plan_brief",
+				"execution_result",
+				"validation_brief",
+				"retry_request",
+				"final_report"
+			]
+		},
+		"taskType": {
+			"type": "string",
+			"enum": ["read", "create", "modify", "repair", "verify"]
+		},
+		"constraintBlock": {
+			"type": "object",
+			"properties": {
+				"target_version": {
+					"type": "string"
+				},
+				"allow_experimental": {
+					"type": "boolean"
+				},
+				"allow_rebuild": {
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": true
+		},
+		"messageEnvelope": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"message_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"from_agent": {
+					"type": "string",
+					"minLength": 1
+				},
+				"to_agent": {
+					"type": "string",
+					"minLength": 1
+				},
+				"message_type": {
+					"$ref": "#/$defs/messageType"
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"priority": {
+					"$ref": "#/$defs/priority"
+				},
+				"payload": {
+					"type": "object"
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"task_id",
+				"message_id",
+				"from_agent",
+				"to_agent",
+				"message_type",
+				"scope",
+				"priority",
+				"payload",
+				"next_action"
+			],
+			"additionalProperties": false
+		},
+		"taskBrief": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"task_type": {
+					"$ref": "#/$defs/taskType"
+				},
+				"goal": {
+					"type": "string",
+					"minLength": 1
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"priority": {
+					"$ref": "#/$defs/priority"
+				},
+				"constraints": {
+					"$ref": "#/$defs/constraintBlock"
+				},
+				"requires_state_read": {
+					"type": "boolean"
+				},
+				"requires_kb_check": {
+					"type": "boolean"
+				},
+				"requires_edit": {
+					"type": "boolean"
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"task_id",
+				"task_type",
+				"goal",
+				"scope",
+				"priority",
+				"constraints",
+				"requires_state_read",
+				"requires_kb_check",
+				"requires_edit",
+				"next_action"
+			],
+			"additionalProperties": false
+		},
+		"projectStateBrief": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"summary": {
+					"type": "object",
+					"properties": {
+						"top_level_nodes": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {"type": "string"},
+									"type": {"type": "string"},
+									"path": {"type": "string"}
+								},
+								"required": ["name", "type", "path"],
+								"additionalProperties": false
+							}
+						},
+						"relevant_nodes": {
+							"type": "array",
+							"items": {"type": "string"}
+						},
+						"key_connections": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"target": {"type": "string"},
+									"inputs": {
+										"type": "array",
+										"items": {"type": "string"}
+									}
+								},
+								"required": ["target", "inputs"],
+								"additionalProperties": false
+							}
+						},
+						"non_default_nodes": {
+							"type": "array",
+							"items": {"type": "string"}
+						}
+					},
+					"required": ["top_level_nodes", "relevant_nodes", "key_connections", "non_default_nodes"],
+					"additionalProperties": false
+				},
+				"evidence_files": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": ["task_id", "scope", "summary", "evidence_files", "next_action"],
+			"additionalProperties": false
+		},
+		"validationStateBrief": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"summary": {
+					"type": "object",
+					"properties": {
+						"top_level_nodes": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {"type": "string"},
+									"type": {"type": "string"},
+									"path": {"type": "string"}
+								},
+								"required": ["name", "type", "path"],
+								"additionalProperties": false
+							}
+						},
+						"relevant_nodes": {
+							"type": "array",
+							"items": {"type": "string"}
+						},
+						"key_connections": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"target": {"type": "string"},
+									"inputs": {
+										"type": "array",
+										"items": {"type": "string"}
+									}
+								},
+								"required": ["target", "inputs"],
+								"additionalProperties": false
+							}
+						},
+						"non_default_nodes": {
+							"type": "array",
+							"items": {"type": "string"}
+						}
+					},
+					"required": ["top_level_nodes", "relevant_nodes", "key_connections", "non_default_nodes"],
+					"additionalProperties": false
+				},
+				"evidence_files": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"executed_commands": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": ["task_id", "scope", "summary", "evidence_files", "executed_commands", "next_action"],
+			"additionalProperties": false
+		},
+		"candidatePlan": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"goal": {
+					"type": "string",
+					"minLength": 1
+				},
+				"candidate_nodes": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"candidate_families": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"strategy": {
+					"type": "string",
+					"minLength": 1
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": ["task_id", "scope", "goal", "candidate_nodes", "candidate_families", "strategy", "next_action"],
+			"additionalProperties": false
+		},
+		"compatibilityBrief": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"version_assumption": {
+					"type": "string",
+					"minLength": 1
+				},
+				"compatible_choices": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"entity": {"type": "string"},
+							"reason": {"type": "string"}
+						},
+						"required": ["entity", "reason"],
+						"additionalProperties": false
+					}
+				},
+				"rejected_choices": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"entity": {"type": "string"},
+							"reason": {"type": "string"}
+						},
+						"required": ["entity", "reason"],
+						"additionalProperties": false
+					}
+				},
+				"evidence": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"source": {"type": "string"},
+							"key": {"type": "string"}
+						},
+						"required": ["source", "key"],
+						"additionalProperties": false
+					}
+				},
+				"recommendation": {
+					"type": "string",
+					"minLength": 1
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"task_id",
+				"scope",
+				"version_assumption",
+				"compatible_choices",
+				"rejected_choices",
+				"evidence",
+				"recommendation",
+				"next_action"
+			],
+			"additionalProperties": false
+		},
+		"editPlanBrief": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"scope": {
+					"type": "string",
+					"minLength": 1
+				},
+				"edit_goal": {
+					"type": "string",
+					"minLength": 1
+				},
+				"framework_changes": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"path": {"type": "string"},
+							"type": {"type": "string"},
+							"action": {"type": "string"}
+						},
+						"required": ["path", "type", "action"],
+						"additionalProperties": false
+					}
+				},
+				"execution_chain": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"risk_points": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"task_id",
+				"scope",
+				"edit_goal",
+				"framework_changes",
+				"execution_chain",
+				"risk_points",
+				"next_action"
+			],
+			"additionalProperties": false
+		},
+		"executionResult": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"status": {
+					"type": "string",
+					"enum": ["executed", "failed"]
+				},
+				"executed_commands": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"runtime_notes": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": ["task_id", "status", "executed_commands", "runtime_notes", "next_action"],
+			"additionalProperties": false
+		},
+		"validationBrief": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"status": {
+					"type": "string",
+					"enum": ["pass", "fail"]
+				},
+				"result_type": {
+					"type": "string",
+					"enum": [
+						"goal_match",
+						"compatibility_failure",
+						"framework_failure",
+						"execution_failure",
+						"goal_mismatch"
+					]
+				},
+				"verified_changes": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"remaining_issues": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"retry_target": {
+					"type": "string"
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"task_id",
+				"status",
+				"result_type",
+				"verified_changes",
+				"remaining_issues",
+				"retry_target",
+				"next_action"
+			],
+			"additionalProperties": false
+		},
+		"retryRequest": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"message_type": {
+					"type": "string",
+					"const": "retry_request"
+				},
+				"failure_type": {
+					"type": "string",
+					"enum": [
+						"compatibility_failure",
+						"framework_failure",
+						"execution_failure",
+						"goal_mismatch"
+					]
+				},
+				"failure_summary": {
+					"type": "string",
+					"minLength": 1
+				},
+				"retry_target": {
+					"type": "string",
+					"minLength": 1
+				},
+				"suggested_fix": {
+					"type": "string",
+					"minLength": 1
+				},
+				"next_action": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"task_id",
+				"message_type",
+				"failure_type",
+				"failure_summary",
+				"retry_target",
+				"suggested_fix",
+				"next_action"
+			],
+			"additionalProperties": false
+		},
+		"finalReport": {
+			"type": "object",
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"status": {
+					"type": "string",
+					"enum": ["completed", "failed"]
+				},
+				"summary": {
+					"type": "string",
+					"minLength": 1
+				},
+				"artifacts": {
+					"type": "array",
+					"items": {"type": "string"}
+				},
+				"follow_up": {
+					"type": "array",
+					"items": {"type": "string"}
+				}
+			},
+			"required": ["task_id", "status", "summary", "artifacts", "follow_up"],
+			"additionalProperties": false
+		}
+	}
+}

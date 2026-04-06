@@ -1,0 +1,13 @@
+{
+	"task_id": "td-create-03993340",
+	"created_at": "20260406-113339",
+	"retry_request": {
+		"task_id": "td-create-03993340",
+		"message_type": "retry_request",
+		"failure_type": "execution_failure",
+		"failure_summary": "write_framework_json:file=/Users/stemerliu/Documents/SuperLib/TD自动化/OP_Framework.json;nodes=0；[Errno 61] Connection refused",
+		"retry_target": "agent-3-framework-editor",
+		"suggested_fix": "根据失败类型回到目标 agent，补充兼容性或框架调整后重试。",
+		"next_action": "dispatch_retry_to_agent-3-framework-editor"
+	}
+}

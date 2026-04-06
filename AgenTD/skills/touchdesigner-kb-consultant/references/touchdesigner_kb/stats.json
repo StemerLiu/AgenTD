@@ -1,0 +1,42 @@
+{
+  "documents": 3271,
+  "chunks": 40698,
+  "high_value_assets": 32,
+  "version_entities": 1468,
+  "version_families": 7,
+  "page_types": {
+    "category": 24,
+    "concept": 846,
+    "experimental": 33,
+    "external_bridge": 3,
+    "file_page": 892,
+    "operator": 693,
+    "operator_family": 7,
+    "python_class": 768,
+    "talk": 2,
+    "user": 3
+  },
+  "namespaces": {
+    "Category": 24,
+    "Derivative": 3,
+    "Dialogs": 1,
+    "Experimental": 33,
+    "File": 892,
+    "MediaWiki": 1,
+    "Module": 1,
+    "Network_Utilities": 1,
+    "Palette": 196,
+    "Pallette": 1,
+    "Python_Drag": 1,
+    "Release_Notes": 31,
+    "TCP": 1,
+    "TScript": 1,
+    "Talk": 2,
+    "Text_TOP": 1,
+    "Touch_In": 1,
+    "User": 3,
+    "root": 2077
+  },
+  "chunk_size": 1800,
+  "min_chunk_size": 400
+}

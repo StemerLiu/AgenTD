@@ -1,0 +1,37 @@
+{
+	"agent_id": "agent-3-framework-editor",
+	"role": "framework_editor",
+	"skill": "touchdesigner-op-framework-editor",
+	"consumes": [
+		{
+			"message_type": "task_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+		},
+		{
+			"message_type": "project_state_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/projectStateBrief"
+		},
+		{
+			"message_type": "compatibility_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/compatibilityBrief"
+		},
+		{
+			"message_type": "retry_request",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+		}
+	],
+	"produces": [
+		{
+			"message_type": "edit_plan_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/editPlanBrief"
+		},
+		{
+			"message_type": "execution_result",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/executionResult"
+		}
+	],
+	"routes_to": [
+		"agent-4-verifier",
+		"agent-0-orchestrator"
+	]
+}

@@ -1,0 +1,39 @@
+{
+	"agent_id": "agent-0-orchestrator",
+	"role": "orchestrator",
+	"consumes": [
+		"user_goal",
+		{
+			"message_type": "project_state_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/projectStateBrief"
+		},
+		{
+			"message_type": "validation_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/validationBrief"
+		},
+		{
+			"message_type": "retry_request",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+		}
+	],
+	"produces": [
+		{
+			"message_type": "task_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+		},
+		{
+			"message_type": "candidate_plan",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/candidatePlan"
+		},
+		{
+			"message_type": "final_report",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/finalReport"
+		}
+	],
+	"routes_to": [
+		"agent-1-state-reader",
+		"agent-2-kb-consultant",
+		"agent-3-framework-editor",
+		"agent-4-verifier"
+	]
+}

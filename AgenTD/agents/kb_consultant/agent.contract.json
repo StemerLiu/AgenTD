@@ -1,0 +1,33 @@
+{
+	"agent_id": "agent-2-kb-consultant",
+	"role": "kb_consultant",
+	"skill": "touchdesigner-kb-consultant",
+	"consumes": [
+		{
+			"message_type": "task_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+		},
+		{
+			"message_type": "project_state_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/projectStateBrief"
+		},
+		{
+			"message_type": "candidate_plan",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/candidatePlan"
+		},
+		{
+			"message_type": "retry_request",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+		}
+	],
+	"produces": [
+		{
+			"message_type": "compatibility_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/compatibilityBrief"
+		}
+	],
+	"routes_to": [
+		"agent-3-framework-editor",
+		"agent-0-orchestrator"
+	]
+}

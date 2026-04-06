@@ -1,0 +1,19 @@
+{
+	"agent_id": "agent-3-framework-editor",
+	"prompt_file": "../prompts/system.txt",
+	"runtime_exports": {
+		"build_edit_plan_brief": "build_edit_plan_brief",
+		"build_execution_result": "build_execution_result",
+		"build_retry_edit_plan_brief": "build_retry_edit_plan_brief"
+	},
+	"input_refs": [
+		"../shared/multiagent.schema.json#/$defs/taskBrief",
+		"../shared/multiagent.schema.json#/$defs/projectStateBrief",
+		"../shared/multiagent.schema.json#/$defs/compatibilityBrief",
+		"../shared/multiagent.schema.json#/$defs/retryRequest"
+	],
+	"output_refs": [
+		"../shared/multiagent.schema.json#/$defs/editPlanBrief",
+		"../shared/multiagent.schema.json#/$defs/executionResult"
+	]
+}

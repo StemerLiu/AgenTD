@@ -1,0 +1,22 @@
+{
+	"agent_id": "agent-1-state-reader",
+	"role": "state_reader",
+	"skill": "touchdesigner-project-state-reader",
+	"consumes": [
+		{
+			"message_type": "task_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+		}
+	],
+	"produces": [
+		{
+			"message_type": "project_state_brief",
+			"schema_ref": "../shared/multiagent.schema.json#/$defs/projectStateBrief"
+		}
+	],
+	"routes_to": [
+		"agent-0-orchestrator",
+		"agent-2-kb-consultant",
+		"agent-3-framework-editor"
+	]
+}

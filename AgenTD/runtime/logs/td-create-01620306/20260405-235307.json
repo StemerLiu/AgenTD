@@ -1,0 +1,485 @@
+{
+	"task_id": "td-create-01620306",
+	"created_at": "20260405-235307",
+	"plan": {
+		"orchestrator": {
+			"agent_id": "agent-0-orchestrator",
+			"role": "orchestrator",
+			"consumes": [
+				"user_goal",
+				{
+					"message_type": "validation_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/validationBrief"
+				},
+				{
+					"message_type": "retry_request",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/retryRequest"
+				}
+			],
+			"produces": [
+				{
+					"message_type": "task_brief",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/taskBrief"
+				},
+				{
+					"message_type": "final_report",
+					"schema_ref": "../shared/multiagent.schema.json#/$defs/finalReport"
+				}
+			],
+			"routes_to": [
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			]
+		},
+		"task_brief": {
+			"task_id": "td-create-01620306",
+			"task_type": "create",
+			"goal": "创建一个新的 baseCOMP 节点",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"envelope": {
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"task_type": "create",
+				"goal": "创建一个新的 baseCOMP 节点",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": true,
+				"requires_edit": true,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		"route": [
+			{
+				"agent_id": "agent-1-state-reader",
+				"role": "state_reader",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"project_state_brief"
+				]
+			},
+			{
+				"agent_id": "agent-2-kb-consultant",
+				"role": "kb_consultant",
+				"skill": "touchdesigner-kb-consultant",
+				"produces": [
+					"compatibility_brief"
+				]
+			},
+			{
+				"agent_id": "agent-3-framework-editor",
+				"role": "framework_editor",
+				"skill": "touchdesigner-op-framework-editor",
+				"produces": [
+					"edit_plan_brief",
+					"execution_result"
+				]
+			},
+			{
+				"agent_id": "agent-4-verifier",
+				"role": "verifier",
+				"skill": "touchdesigner-project-state-reader",
+				"produces": [
+					"validation_brief",
+					"retry_request"
+				]
+			}
+		],
+		"contracts_loaded": [
+			"agent-0-orchestrator",
+			"agent-1-state-reader",
+			"agent-2-kb-consultant",
+			"agent-3-framework-editor",
+			"agent-4-verifier"
+		],
+		"routing_config": {
+			"agent_order": [
+				"agent-0-orchestrator",
+				"agent-1-state-reader",
+				"agent-2-kb-consultant",
+				"agent-3-framework-editor",
+				"agent-4-verifier"
+			],
+			"default_scope": "/project1"
+		},
+		"validation": {
+			"ok": true,
+			"schema_checks": {
+				"task_brief": {
+					"schema": "taskBrief",
+					"ok": true,
+					"errors": []
+				}
+			},
+			"envelope_checks": [
+				{
+					"schema": "messageEnvelope",
+					"ok": true,
+					"errors": [],
+					"index": 0
+				}
+			],
+			"contract_flow": {
+				"ok": true,
+				"errors": []
+			},
+			"route_length": 4
+		}
+	},
+	"messages": [
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0001",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "agent-1-state-reader",
+			"message_type": "task_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"task_type": "create",
+				"goal": "创建一个新的 baseCOMP 节点",
+				"scope": "/project1",
+				"priority": "high",
+				"constraints": {
+					"target_version": "",
+					"allow_experimental": false,
+					"allow_rebuild": false
+				},
+				"requires_state_read": true,
+				"requires_kb_check": true,
+				"requires_edit": true,
+				"next_action": "dispatch_to_agent_1"
+			},
+			"next_action": "dispatch_to_agent_1"
+		},
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0002",
+			"from_agent": "agent-1-state-reader",
+			"to_agent": "agent-2-kb-consultant",
+			"message_type": "project_state_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"scope": "/project1",
+				"summary": {
+					"top_level_nodes": [
+						{
+							"name": "examine1",
+							"path": "/project1/examine1",
+							"type": "examineDAT"
+						}
+					],
+					"relevant_nodes": [
+						"test_container8 | baseCOMP | /project1/test_container8"
+					],
+					"key_connections": [],
+					"non_default_nodes": [
+						"test_container8 | baseCOMP | /project1/test_container8"
+					]
+				},
+				"evidence_files": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"next_action": "dispatch_to_agent_2"
+			},
+			"next_action": "dispatch_to_agent_2"
+		},
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0003",
+			"from_agent": "agent-2-kb-consultant",
+			"to_agent": "agent-3-framework-editor",
+			"message_type": "compatibility_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"scope": "/project1",
+				"version_assumption": "current_project_runtime",
+				"compatible_choices": [
+					{
+						"entity": "COMP",
+						"reason": "渠道 stable"
+					}
+				],
+				"rejected_choices": [],
+				"evidence": [
+					{
+						"source": "family_compatibility.jsonl",
+						"key": "COMP"
+					}
+				],
+				"recommendation": "目标涉及的 OP 家族在当前版本假设下可用，可以继续进入编辑或验证阶段。",
+				"next_action": "dispatch_to_agent_3"
+			},
+			"next_action": "dispatch_to_agent_3"
+		},
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0004",
+			"from_agent": "agent-3-framework-editor",
+			"to_agent": "agent-4-verifier",
+			"message_type": "edit_plan_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"scope": "/project1",
+				"edit_goal": "创建一个新的 baseCOMP 节点",
+				"framework_changes": [
+					{
+						"path": "/project1",
+						"type": "baseCOMP",
+						"action": "create"
+					}
+				],
+				"execution_chain": [
+					"write_framework_json",
+					"reload",
+					"replicate_framework",
+					"save_project"
+				],
+				"risk_points": [],
+				"next_action": "dispatch_to_agent_4"
+			},
+			"next_action": "dispatch_to_agent_4"
+		},
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0005",
+			"from_agent": "agent-3-framework-editor",
+			"to_agent": "agent-4-verifier",
+			"message_type": "execution_result",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"status": "executed",
+				"executed_commands": [
+					"write_framework_json",
+					"reload",
+					"replicate_framework",
+					"save_project"
+				],
+				"runtime_notes": [
+					"当前为最小执行流，未实际下发 TouchDesigner 命令"
+				],
+				"next_action": "dispatch_to_agent_4"
+			},
+			"next_action": "dispatch_to_agent_4"
+		},
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0006",
+			"from_agent": "agent-4-verifier",
+			"to_agent": "agent-0-orchestrator",
+			"message_type": "validation_brief",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"status": "pass",
+				"result_type": "goal_match",
+				"verified_changes": [
+					"test_container8 | baseCOMP | /project1/test_container8"
+				],
+				"remaining_issues": [],
+				"retry_target": "",
+				"next_action": "return_to_orchestrator"
+			},
+			"next_action": "return_to_orchestrator"
+		},
+		{
+			"task_id": "td-create-01620306",
+			"message_id": "td-create-01620306-msg-0007",
+			"from_agent": "agent-0-orchestrator",
+			"to_agent": "user",
+			"message_type": "final_report",
+			"scope": "/project1",
+			"priority": "high",
+			"payload": {
+				"task_id": "td-create-01620306",
+				"status": "completed",
+				"summary": "多智能体最小执行流已完成",
+				"artifacts": [
+					"OP_Information.json",
+					"OP_Framework.json"
+				],
+				"follow_up": [
+					"可继续把本次 brief 流转接到真实技能执行器",
+					"后续可基于 relevant_nodes 进一步缩小上下文范围"
+				]
+			},
+			"next_action": "complete"
+		}
+	],
+	"outputs": {
+		"task_brief": {
+			"task_id": "td-create-01620306",
+			"task_type": "create",
+			"goal": "创建一个新的 baseCOMP 节点",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": true,
+			"requires_edit": true,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"project_state_brief": {
+			"task_id": "td-create-01620306",
+			"scope": "/project1",
+			"summary": {
+				"top_level_nodes": [
+					{
+						"name": "examine1",
+						"path": "/project1/examine1",
+						"type": "examineDAT"
+					}
+				],
+				"relevant_nodes": [
+					"test_container8 | baseCOMP | /project1/test_container8"
+				],
+				"key_connections": [],
+				"non_default_nodes": [
+					"test_container8 | baseCOMP | /project1/test_container8"
+				]
+			},
+			"evidence_files": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"next_action": "dispatch_to_agent_2"
+		},
+		"compatibility_brief": {
+			"task_id": "td-create-01620306",
+			"scope": "/project1",
+			"version_assumption": "current_project_runtime",
+			"compatible_choices": [
+				{
+					"entity": "COMP",
+					"reason": "渠道 stable"
+				}
+			],
+			"rejected_choices": [],
+			"evidence": [
+				{
+					"source": "family_compatibility.jsonl",
+					"key": "COMP"
+				}
+			],
+			"recommendation": "目标涉及的 OP 家族在当前版本假设下可用，可以继续进入编辑或验证阶段。",
+			"next_action": "dispatch_to_agent_3"
+		},
+		"edit_plan_brief": {
+			"task_id": "td-create-01620306",
+			"scope": "/project1",
+			"edit_goal": "创建一个新的 baseCOMP 节点",
+			"framework_changes": [
+				{
+					"path": "/project1",
+					"type": "baseCOMP",
+					"action": "create"
+				}
+			],
+			"execution_chain": [
+				"write_framework_json",
+				"reload",
+				"replicate_framework",
+				"save_project"
+			],
+			"risk_points": [],
+			"next_action": "dispatch_to_agent_4"
+		},
+		"execution_result": {
+			"task_id": "td-create-01620306",
+			"status": "executed",
+			"executed_commands": [
+				"write_framework_json",
+				"reload",
+				"replicate_framework",
+				"save_project"
+			],
+			"runtime_notes": [
+				"当前为最小执行流，未实际下发 TouchDesigner 命令"
+			],
+			"next_action": "dispatch_to_agent_4"
+		},
+		"runtime_commands": [
+			{
+				"cmd": "write_framework_json",
+				"file": "OP_Framework.json",
+				"forest": []
+			},
+			{
+				"cmd": "reload"
+			},
+			{
+				"cmd": "replicate_framework",
+				"file": "OP_Framework.json",
+				"clear_parent": false
+			},
+			{
+				"cmd": "save_project"
+			}
+		],
+		"validation_brief": {
+			"task_id": "td-create-01620306",
+			"status": "pass",
+			"result_type": "goal_match",
+			"verified_changes": [
+				"test_container8 | baseCOMP | /project1/test_container8"
+			],
+			"remaining_issues": [],
+			"retry_target": "",
+			"next_action": "return_to_orchestrator"
+		},
+		"final_report": {
+			"task_id": "td-create-01620306",
+			"status": "completed",
+			"summary": "多智能体最小执行流已完成",
+			"artifacts": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"follow_up": [
+				"可继续把本次 brief 流转接到真实技能执行器",
+				"后续可基于 relevant_nodes 进一步缩小上下文范围"
+			]
+		}
+	}
+}

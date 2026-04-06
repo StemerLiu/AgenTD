@@ -1,0 +1,13 @@
+{
+	"task_id": "td-create-01620306",
+	"created_at": "20260405-235619",
+	"retry_request": {
+		"task_id": "td-create-01620306",
+		"message_type": "retry_request",
+		"failure_type": "execution_failure",
+		"failure_summary": "[Errno 61] Connection refused",
+		"retry_target": "agent-3-framework-editor",
+		"suggested_fix": "根据失败类型回到目标 agent，补充兼容性或框架调整后重试。",
+		"next_action": "dispatch_retry_to_agent-3-framework-editor"
+	}
+}

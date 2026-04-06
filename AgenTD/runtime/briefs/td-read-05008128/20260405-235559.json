@@ -1,0 +1,58 @@
+{
+	"task_id": "td-read-05008128",
+	"created_at": "20260405-235559",
+	"outputs": {
+		"task_brief": {
+			"task_id": "td-read-05008128",
+			"task_type": "read",
+			"goal": "读取当前 TouchDesigner 工程内容都有什么",
+			"scope": "/project1",
+			"priority": "high",
+			"constraints": {
+				"target_version": "",
+				"allow_experimental": false,
+				"allow_rebuild": false
+			},
+			"requires_state_read": true,
+			"requires_kb_check": false,
+			"requires_edit": false,
+			"next_action": "dispatch_to_agent_1"
+		},
+		"project_state_brief": {
+			"task_id": "td-read-05008128",
+			"scope": "/project1",
+			"summary": {
+				"top_level_nodes": [
+					{
+						"name": "examine1",
+						"path": "/project1/examine1",
+						"type": "examineDAT"
+					}
+				],
+				"relevant_nodes": [],
+				"key_connections": [],
+				"non_default_nodes": [
+					"test_container8 | baseCOMP | /project1/test_container8"
+				]
+			},
+			"evidence_files": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"next_action": "return_to_orchestrator"
+		},
+		"final_report": {
+			"task_id": "td-read-05008128",
+			"status": "completed",
+			"summary": "只读分析已完成，当前工程状态已返回给 Orchestrator。",
+			"artifacts": [
+				"OP_Information.json",
+				"OP_Framework.json"
+			],
+			"follow_up": [
+				"顶层节点数: 1",
+				"可继续基于 relevant_nodes 缩小后续编辑上下文"
+			]
+		}
+	}
+}
