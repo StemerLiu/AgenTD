@@ -9,7 +9,7 @@ from urllib import request, error
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
-WORKSPACE_ROOT = os.path.dirname(PROJECT_ROOT)
+WORKSPACE_ROOT = PROJECT_ROOT
 WEB_ROOT = os.path.join(PROJECT_ROOT, 'web')
 AGENTS_ROOT = os.path.join(PROJECT_ROOT, 'agents')
 AGENTS_SHARED_ROOT = os.path.join(AGENTS_ROOT, 'shared')
@@ -64,51 +64,20 @@ ALLOWED_CMDS = [
 	'refresh_project_state'
 ]
 
-PLANNER_PROMPT = (
-	'你是规划专家（Planner）。你的任务是把用户目标拆成可执行子任务。'
-	'仅输出JSON对象，不要输出Markdown。'
-	'JSON格式: {"summary":"", "tasks":[{"goal":"","target":"","priority":"high|medium|low"}], "assumptions":[""]}。'
-)
+import threading
 
-EXECUTOR_PROMPT = (
-	'你是执行者（Executor）。基于用户目标与规划，生成可执行TD命令。'
-	'只允许使用以下cmd: ' + ', '.join(ALLOWED_CMDS) + '。'
-	'仅输出JSON对象，不要输出Markdown。'
-	'JSON格式: {"reply":"给用户的执行说明", "commands":[{"cmd":"..."}], "checks":["执行前校验点"]}。'
-	'任何涉及节点创建、删除、连线、参数修改、自定义参数、DAT内容修改的结构编辑，'
-	'都必须通过 OP_Framework 标准JSON文件完成，并使用 reload -> replicate_framework -> save_project 的链路。'
-	'必须先输出 write_framework_json 命令，把完整框架树写入 OP_Framework.json。'
-	'write_framework_json 的格式为 {"cmd":"write_framework_json","file":"OP_Framework.json","forest":[...]}。'
-	'forest 必须是 OP_Framework 标准树：每个节点为 {"nodeName":{"relPath":"...","type":"...","pos":{"x":0,"y":0},"parameters":{"Page":{"par":{"val":"...","mode":"ParMode.CONSTANT"}}},"connections":{"inputs":[{"port":0,"links":["srcNode"]}]}}}。'
-	'所有 type 必须是合法具体 TD OP 类型，并且必须以 TOP/CHOP/SOP/COMP/DAT/MAT 结尾，例如 containerCOMP、textDAT、webrenderTOP、nullTOP。'
-	'严禁输出 WebContainer、Text、Image、Node 这类伪类型名。'
-	'如果目标涉及 HTML/CSS/JS、网页交互、鼠标跟随、小球动画等网页内容，优先使用 textDAT 存放页面内容，并使用 webrenderTOP 渲染；不要发明 WebContainer。'
-	'如果用户要求连接，必须把连接写进目标节点的 connections.inputs。'
-	'如果用户要求改参数，必须把参数写进 parameters 页面里，不能留空。'
-	'如果要创建多个节点，不能把它们都放在相同坐标，可做简单横向布局。'
-	'随后再输出 replicate_framework 所需命令。'
-	'禁止输出 create/par/connect/clear/delete/hover/build_glsl_cube 等旧式编辑命令。'
-)
+_thread_local = threading.local()
 
-REPAIR_EXECUTOR_PROMPT = (
-	'你是修复执行者（Executor Repair）。'
-	'你会收到用户目标、上一版命令和校验失败原因。'
-	'你必须输出修复后的最终 JSON，不要解释，不要Markdown。'
-	'只允许使用以下cmd: ' + ', '.join(ALLOWED_CMDS) + '。'
-	'JSON格式: {"reply":"", "commands":[{"cmd":"..."}], "checks":[""]}。'
-	'必须修复所有校验失败项，尤其是缺失连接、缺失参数设置、错误字段名、节点重叠。'
-	'如果出现 WebContainer、Text、Image、Node 这类伪类型，必须改成合法具体 TD OP 类型。'
-	'网页交互场景必须改成合法 TD 节点方案，优先使用 textDAT + webrenderTOP。'
-	'必须输出可直接执行的 write_framework_json -> reload -> replicate_framework 链路。'
-)
-
-REVIEWER_PROMPT = (
-	'你是审计员（Reviewer）。基于规划和执行草案做风险审计。'
-	'必须覆盖 errors/warnings 视角；性能指标尚未接入时要明确标记未实现。'
-	'仅输出JSON对象，不要输出Markdown。'
-	'JSON格式: {"assessment":"", "risks":[""], "suggestions":[""], "performance":"not_implemented|provided"}。'
-)
-
+def _emit_stage(stage: str, status: str, message: str, summary: str = '', metrics: list = None):
+	emit_fn = getattr(_thread_local, 'emit', None)
+	if callable(emit_fn):
+		emit_fn('stage', {
+			'stage': stage,
+			'status': status,
+			'message': message,
+			'summary': summary,
+			'metrics': metrics or []
+		})
 
 def _json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict):
 	body = json.dumps(payload, ensure_ascii=False).encode('utf-8')
@@ -927,7 +896,8 @@ def _build_agent_runtime_context():
 		'execute_runtime_commands': _execute_runtime_commands,
 		'refresh_project_state_after_execution': _refresh_project_state_after_execution,
 		'detect_runtime_bootstrap_issue': _detect_runtime_bootstrap_issue,
-		'verify_framework_changes_against_project': _verify_framework_changes_against_project
+		'verify_framework_changes_against_project': _verify_framework_changes_against_project,
+		'call_agent_json': _call_agent_json
 	}
 
 
@@ -952,7 +922,9 @@ def _normalize_framework_change(item: dict, scope: str):
 	return {
 		'path': path,
 		'type': str(item.get('type') or 'baseCOMP').strip() or 'baseCOMP',
-		'action': str(item.get('action') or 'modify').strip() or 'modify'
+		'action': str(item.get('action') or 'modify').strip() or 'modify',
+		'parameters': item.get('parameters', {}),
+		'connections': item.get('connections', {})
 	}
 
 
@@ -986,6 +958,7 @@ def _build_tree_from_paths(path_specs: list, parent_path: str = '/project1'):
 			'type': _normalize_op_type(str(item.get('type') or 'baseCOMP'), _node_name_from_path(rel_path)),
 			'pos': item.get('pos', {'x': 0, 'y': 0}),
 			'parameters': item.get('parameters', {}),
+			'connections': item.get('connections', {}),
 			'children': []
 		}
 	for rel_path in sorted(node_map.keys(), key=lambda value: value.count('/'), reverse=True):
@@ -1015,7 +988,8 @@ def _build_forest_from_framework_changes(task_brief: dict, edit_plan_brief: dict
 		path_specs.append({
 			'path': path,
 			'type': str(item.get('type') or 'baseCOMP'),
-			'parameters': {},
+			'parameters': item.get('parameters', {}),
+			'connections': item.get('connections', {}),
 			'pos': {'x': index * 180, 'y': 0}
 		})
 	if not path_specs:
@@ -1044,7 +1018,7 @@ def _build_runtime_command_chain(task_brief: dict, edit_plan_brief: dict, data: 
 	return [
 		{'cmd': 'write_framework_json', 'file': file_name, 'forest': forest},
 		{'cmd': 'reload'},
-		{'cmd': 'replicate_framework', 'file': file_name, 'clear_parent': bool(task_brief.get('constraints', {}).get('allow_rebuild', False))},
+		{'cmd': 'replicate_framework', 'file': 'AgenTD/' + file_name, 'clear_parent': bool(task_brief.get('constraints', {}).get('allow_rebuild', False))},
 		{'cmd': 'save_project'}
 	]
 
@@ -1332,9 +1306,12 @@ def _run_finalization_block(plan: dict, task_brief: dict, validation_brief: dict
 
 
 def _build_multiagent_execution(data: dict):
+	_emit_stage('orchestrator', 'running', 'Orchestrator 正在规划路线...')
 	registry = _load_agent_registry()
 	plan = _build_multiagent_route_plan(data, registry=registry)
 	task_brief = plan['task_brief']
+	_emit_stage('orchestrator', 'done', '路线规划完成', task_brief.get('summary', ''))
+	
 	execution_state = _invoke_orchestrator_runtime('build_execution_state', plan, registry=registry)
 	messages = execution_state.get('messages', []) if isinstance(execution_state, dict) else []
 	outputs = execution_state.get('outputs', {}) if isinstance(execution_state, dict) else {}
@@ -1345,17 +1322,26 @@ def _build_multiagent_execution(data: dict):
 	candidate_plan = execution_seed.get('candidate_plan')
 	compatibility_brief = execution_seed.get('compatibility_brief')
 	edit_plan_brief = execution_seed.get('edit_plan_brief', {})
+	
+	_emit_stage('state_reader', 'running', 'State Reader 正在读取项目现状...')
 	state_result = _run_state_block(task_brief, data, messages, outputs, message_index, registry)
 	messages = state_result.get('messages', messages)
 	state_brief = state_result.get('state_brief', state_brief)
 	message_index = int(state_result.get('message_index', message_index))
+	_emit_stage('state_reader', 'done', '项目现状已读取')
+	
 	if task_brief.get('task_type') == 'read':
 		return _run_read_only_block(plan, task_brief, state_brief, messages, outputs, message_index, registry)
+		
+	_emit_stage('kb_consultant', 'running', 'KB Consultant 正在校验兼容性...')
 	kb_result = _run_kb_block(task_brief, state_brief, messages, outputs, message_index, registry)
 	messages = kb_result.get('messages', messages)
 	candidate_plan = kb_result.get('candidate_plan', candidate_plan)
 	compatibility_brief = kb_result.get('compatibility_brief', compatibility_brief)
 	message_index = int(kb_result.get('message_index', message_index))
+	_emit_stage('kb_consultant', 'done', '知识校验完成')
+	
+	_emit_stage('framework_editor', 'running', 'Framework Editor 正在生成方案...')
 	execution_result = _run_execution_validation_block(task_brief, state_brief, compatibility_brief, edit_plan_brief, data, messages, outputs, message_index, registry)
 	messages = execution_result.get('messages', messages)
 	validation_state_brief = execution_result.get('validation_state_brief', validation_state_brief)
@@ -1365,11 +1351,15 @@ def _build_multiagent_execution(data: dict):
 	output_patch = execution_result.get('output_patch', {})
 	retry_phase = execution_result.get('retry_phase', {})
 	message_index = int(execution_result.get('message_index', message_index))
+	_emit_stage('framework_editor', 'done', '连线方案已生成并校验')
+	
 	retry_policy = _invoke_orchestrator_runtime('build_auto_retry_policy', data, registry=registry)
 	auto_retry_enabled = bool(retry_policy.get('auto_retry_enabled', True))
 	max_auto_retries = int(retry_policy.get('max_auto_retries', 0))
 	auto_retry_count = 0
+	
 	while retry_request and auto_retry_enabled and auto_retry_count < max_auto_retries:
+		_emit_stage('verifier', 'running', f'Verifier 触发自动回环重试 (第 {auto_retry_count + 1} 次)...')
 		retry_result = _run_retry_cycle(task_brief, state_brief, validation_state_brief, candidate_plan, compatibility_brief, edit_plan_brief, data, retry_request, messages, outputs, message_index, registry)
 		messages = retry_result.get('messages', messages)
 		validation_state_brief = retry_result.get('validation_state_brief', validation_state_brief)
@@ -1380,9 +1370,28 @@ def _build_multiagent_execution(data: dict):
 		retry_request = retry_result.get('retry_request')
 		message_index = int(retry_result.get('message_index', message_index))
 		auto_retry_count += 1
+		_emit_stage('verifier', 'done', f'第 {auto_retry_count} 次回环重试结束')
+		
 	outputs['auto_retry_count'] = auto_retry_count
 	clear_retry_request = bool(output_patch.get('clear_retry_request')) or bool(retry_phase.get('clear_retry_request'))
-	return _run_finalization_block(plan, task_brief, validation_brief, state_brief, compatibility_brief, retry_request, messages, outputs, message_index, registry, clear_retry_request)
+	
+	_emit_stage('assistant', 'running', '正在汇总最终报告...')
+	final_runtime = _run_finalization_block(plan, task_brief, validation_brief, state_brief, compatibility_brief, retry_request, messages, outputs, message_index, registry, clear_retry_request)
+	_emit_stage('assistant', 'done', '报告汇总完成')
+	
+	final_outputs = final_runtime.get('outputs', {})
+	final_commands = final_outputs.get('runtime_commands', [])
+	if final_commands:
+		emit_fn = getattr(_thread_local, 'emit', None)
+		if callable(emit_fn):
+			emit_fn('stage', {
+				'stage': 'framework_editor',
+				'status': 'done',
+				'message': '命令生成',
+				'commandCount': len(final_commands),
+				'commands': final_commands
+			})
+	return final_runtime
 
 
 def _execute_local_command(cmd_obj: dict):
@@ -1918,7 +1927,7 @@ def _normalize_command(item: dict):
 	if cmd == 'replicate_framework':
 		return {
 			'cmd': 'replicate_framework',
-			'file': str(item.get('file') or item.get('source') or DEFAULT_FRAMEWORK_FILE),
+			'file': 'AgenTD/' + str(item.get('file') or item.get('source') or DEFAULT_FRAMEWORK_FILE),
 			'clear_parent': bool(item.get('clear_parent', True))
 		}
 	if cmd == 'save_project':
@@ -2188,150 +2197,6 @@ def _split_chunks(text: str, size: int = 20):
 	return out
 
 
-def _build_collaboration_payload(messages: list, config: dict, context: dict = None, emit=None):
-	if context is None:
-		context = {}
-	
-	last_user_message = ''
-	for m in reversed(messages):
-		if isinstance(m, dict) and m.get('role') == 'user':
-			last_user_message = str(m.get('content', ''))
-			break
-	history_lines = []
-	for m in messages[-8:]:
-		if not isinstance(m, dict):
-			continue
-		role = str(m.get('role', 'user'))
-		content = str(m.get('content', ''))
-		history_lines.append(f'{role}: {content}')
-	history_text = '\n'.join(history_lines)
-	
-	context_str = ''
-	if context.get('summary'):
-		context_str += f"工程摘要:\n{_to_json_text(context['summary'])}\n\n"
-	if context.get('history'):
-		context_str += f"最近执行历史:\n{_to_json_text(context['history'])}\n\n"
-		
-	if callable(emit):
-		emit('stage', {'stage': 'planner', 'status': 'running', 'message': 'Planner 正在拆解任务'})
-	planner_input = (
-		'请根据以下工程上下文、对话上下文与最新用户目标做任务拆分。\n'
-		f'{context_str}'
-		f'对话上下文:\n{history_text}\n'
-		f'最新目标:\n{last_user_message}'
-	)
-	planner_raw, planner_data = _call_agent_json(PLANNER_PROMPT, planner_input, config, 60)
-	if callable(emit):
-		emit('stage', {
-			'stage': 'planner',
-			'status': 'done',
-			'message': 'Planner 任务拆解完成',
-			'summary': planner_data.get('summary', ''),
-			'taskCount': len(planner_data.get('tasks', [])) if isinstance(planner_data.get('tasks', []), list) else 0
-		})
-	if callable(emit):
-		emit('stage', {'stage': 'executor', 'status': 'running', 'message': 'Executor 正在生成命令'})
-	executor_input = (
-		'请根据用户目标和规划结果生成命令。\n'
-		f'用户目标:\n{last_user_message}\n'
-		f'规划结果:\n{_to_json_text(planner_data)}'
-	)
-	executor_raw, executor_data = _call_agent_json(EXECUTOR_PROMPT, executor_input, config, 60)
-	base_commands = executor_data.get('commands', [])
-	if not isinstance(base_commands, list) or not base_commands:
-		base_commands = _extract_command_array(executor_raw)
-	base_commands = _normalize_commands(base_commands)
-	validation_issues = _validate_framework_commands(last_user_message, base_commands)
-	if validation_issues:
-		repair_input = (
-			'请修复上一版命令，使其满足用户目标和协议要求。\n'
-			f'用户目标:\n{last_user_message}\n'
-			f'上一版命令:\n{_to_json_text(base_commands)}\n'
-			f'必须修复的问题:\n{_to_json_text(validation_issues)}'
-		)
-		repair_raw, repair_data = _call_agent_json(REPAIR_EXECUTOR_PROMPT, repair_input, config, 60)
-		repaired_commands = repair_data.get('commands', [])
-		if not isinstance(repaired_commands, list) or not repaired_commands:
-			repaired_commands = _extract_command_array(repair_raw)
-		repaired_commands = _normalize_commands(repaired_commands)
-		repaired_issues = _validate_framework_commands(last_user_message, repaired_commands)
-		if repaired_commands and not repaired_issues:
-			base_commands = repaired_commands
-			executor_raw = repair_raw
-			executor_data = repair_data if isinstance(repair_data, dict) else executor_data
-			if not str(executor_data.get('reply') or '').strip():
-				executor_data['reply'] = '已自动修复执行命令，使其满足框架协议与用户目标。'
-	final_issues = _validate_framework_commands(last_user_message, base_commands)
-	if final_issues:
-		base_commands = []
-		executor_data = executor_data if isinstance(executor_data, dict) else {}
-		executor_data['reply'] = '未生成可安全执行的命令：当前方案仍不满足 TouchDesigner 框架协议，已阻止下发。请根据校验问题继续修正。'
-		executor_data['checks'] = list(final_issues)
-	commands = _inject_guard_commands(base_commands)
-	if callable(emit):
-		emit('stage', {
-			'stage': 'executor',
-			'status': 'done',
-			'message': 'Executor 命令生成完成',
-			'commandCount': len(commands),
-			'commands': commands
-		})
-	if callable(emit):
-		emit('stage', {'stage': 'reviewer', 'status': 'running', 'message': 'Reviewer 正在审计风险'})
-	reviewer_input = (
-		'请对规划与执行结果做审计。\n'
-		f'规划结果:\n{_to_json_text(planner_data)}\n'
-		f'执行草案:\n{_to_json_text({"reply": executor_data.get("reply", ""), "commands": commands})}'
-	)
-	reviewer_raw, reviewer_data = _call_agent_json(REVIEWER_PROMPT, reviewer_input, config, 60)
-	executor_reply = str(executor_data.get('reply') or '').strip()
-	if not executor_reply:
-		executor_reply = executor_raw.strip()
-	reviewer_assessment = str(reviewer_data.get('assessment') or '').strip()
-	reviewer_perf = str(reviewer_data.get('performance') or 'not_implemented').strip()
-	reply = '\n'.join([
-		executor_reply or '已生成执行方案。',
-		'',
-		f'审计结论: {reviewer_assessment or "已完成风险审计"}',
-		f'性能指标: {"未实现" if reviewer_perf == "not_implemented" else "已提供"}'
-	]).strip()
-	if callable(emit):
-		emit('stage', {
-			'stage': 'reviewer',
-			'status': 'done',
-			'message': 'Reviewer 审计完成',
-			'performance': reviewer_perf
-		})
-	collaboration = {
-		'planner': {
-			'status': 'implemented',
-			'summary': planner_data.get('summary', ''),
-			'tasks': planner_data.get('tasks', []),
-			'assumptions': planner_data.get('assumptions', []),
-			'raw': planner_raw
-		},
-		'executor': {
-			'status': 'implemented_basic',
-			'reply': executor_reply,
-			'checks': executor_data.get('checks', []),
-			'commands': commands,
-			'raw': executor_raw
-		},
-		'reviewer': {
-			'status': 'partial',
-			'assessment': reviewer_assessment,
-			'risks': reviewer_data.get('risks', []),
-			'suggestions': reviewer_data.get('suggestions', []),
-			'performance': reviewer_perf,
-			'raw': reviewer_raw
-		}
-	}
-	if callable(emit):
-		emit('stage', {'stage': 'assistant', 'status': 'streaming', 'message': 'AI 回复流式输出中'})
-		for chunk in _split_chunks(reply, 18):
-			emit('reply_delta', {'delta': chunk})
-		emit('stage', {'stage': 'assistant', 'status': 'done', 'message': 'AI 回复输出完成'})
-	return {'reply': reply, 'commands': commands, 'collaboration': collaboration}
 
 
 class BridgeHandler(BaseHTTPRequestHandler):
@@ -2516,13 +2381,31 @@ class BridgeHandler(BaseHTTPRequestHandler):
 		if not config['api_key']:
 			return _json_response(self, 200, {'ok': False, 'error': 'apiKey不能为空'})
 		try:
-			payload = _build_collaboration_payload(messages, config, context)
-			return _json_response(self, 200, {'ok': True, 'reply': payload['reply'], 'commands': payload['commands'], 'collaboration': payload['collaboration']})
+			last_user_message = ''
+			for m in reversed(messages):
+				if isinstance(m, dict) and m.get('role') == 'user':
+					last_user_message = str(m.get('content', ''))
+					break
+					
+			payload_data = {
+				'user_goal': last_user_message,
+				'messages': messages,
+				'config': config,
+				'context': context,
+				'host': context.get('host', '127.0.0.1') if context else '127.0.0.1',
+				'port': context.get('port', 9988) if context else 9988
+			}
+			runtime = _build_multiagent_execution(payload_data)
+			outputs = runtime.get('outputs', {})
+			commands = outputs.get('runtime_commands', [])
+			reply = outputs.get('final_report', {}).get('summary', '多智能体执行完成')
+			
+			return _json_response(self, 200, {'ok': True, 'reply': reply, 'commands': commands, 'collaboration': runtime})
 		except error.HTTPError as exc:
 			raw = exc.read().decode('utf-8', errors='ignore') if hasattr(exc, 'read') else str(exc)
 			return _json_response(self, 200, {'ok': False, 'error': f'HTTP {exc.code}: {raw}'})
 		except Exception as exc:
-			return _json_response(self, 200, {'ok': False, 'error': _format_network_error(exc, config['base_url'])})
+			return _json_response(self, 200, {'ok': False, 'error': str(exc)})
 
 	def _api_model_chat_stream(self, data: dict):
 		config = _build_provider_config(data.get('config', {}))
@@ -2547,13 +2430,40 @@ class BridgeHandler(BaseHTTPRequestHandler):
 
 		try:
 			emit('start', {'message': '已开始处理请求'})
-			payload = _build_collaboration_payload(messages, config, context, emit)
-			emit('done', payload)
+			_thread_local.emit = emit
+			
+			last_user_message = ''
+			for m in reversed(messages):
+				if isinstance(m, dict) and m.get('role') == 'user':
+					last_user_message = str(m.get('content', ''))
+					break
+					
+			payload_data = {
+				'user_goal': last_user_message,
+				'messages': messages,
+				'config': config,
+				'context': context,
+				'host': context.get('host', '127.0.0.1') if context else '127.0.0.1',
+				'port': context.get('port', 9988) if context else 9988
+			}
+			runtime = _build_multiagent_execution(payload_data)
+			
+			outputs = runtime.get('outputs', {})
+			commands = outputs.get('runtime_commands', [])
+			reply = outputs.get('final_report', {}).get('summary', '多智能体执行完成')
+			
+			emit('done', {
+				'reply': reply,
+				'commands': commands,
+				'collaboration': runtime
+			})
 		except error.HTTPError as exc:
 			raw = exc.read().decode('utf-8', errors='ignore') if hasattr(exc, 'read') else str(exc)
 			emit('error', {'message': f'HTTP {exc.code}: {raw}'})
 		except Exception as exc:
-			emit('error', {'message': _format_network_error(exc, config['base_url'])})
+			emit('error', {'message': str(exc)})
+		finally:
+			_thread_local.emit = None
 
 	def _send_file(self, file_path: str, content_type: str):
 		if not os.path.exists(file_path):

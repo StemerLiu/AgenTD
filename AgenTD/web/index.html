@@ -10,30 +10,35 @@
 	<div class="app-shell">
 		<aside class="left-panel">
 			<h1>TD 自动化控制台</h1>
-			<div class="section">
-				<h2>连接设置</h2>
-				<label for="tdHost">TD Host</label>
-				<input id="tdHost" type="text" value="127.0.0.1" />
-				<label for="tdPort">TD Port</label>
-				<input id="tdPort" type="number" value="9988" />
-			</div>
-			<div class="section">
-				<h2>模型配置</h2>
-				<div class="provider-pill">DeepSeek</div>
-				<label for="model">Model</label>
-				<input id="model" type="text" />
-				<label for="baseUrl">Base URL</label>
-				<input id="baseUrl" type="text" />
-				<label for="apiKey">API Key</label>
-				<input id="apiKey" type="password" placeholder="sk-..." />
-				<label for="temperature">Temperature</label>
-				<input id="temperature" type="number" min="0" max="1.5" step="0.1" value="0.2" />
-				<div class="row">
-					<button id="saveConfigBtn" class="secondary">保存配置</button>
-					<button id="testModelBtn">测试连通</button>
+			<details class="config-details">
+				<summary>展开配置 (连接设置与 API Key)</summary>
+				<div class="config-content">
+					<div class="section">
+						<h2>连接设置</h2>
+						<label for="tdHost">TD Host</label>
+						<input id="tdHost" type="text" value="127.0.0.1" />
+						<label for="tdPort">TD Port</label>
+						<input id="tdPort" type="number" value="9988" />
+					</div>
+					<div class="section">
+						<h2>模型配置</h2>
+						<div class="provider-pill">DeepSeek</div>
+						<label for="model">Model</label>
+						<input id="model" type="text" />
+						<label for="baseUrl">Base URL</label>
+						<input id="baseUrl" type="text" />
+						<label for="apiKey">API Key</label>
+						<input id="apiKey" type="password" placeholder="sk-..." />
+						<label for="temperature">Temperature</label>
+						<input id="temperature" type="number" min="0" max="1.5" step="0.1" value="0.2" />
+						<div class="row">
+							<button id="saveConfigBtn" class="secondary">保存配置</button>
+							<button id="testModelBtn">测试连通</button>
+						</div>
+						<div id="modelStatus" class="status" aria-live="polite"></div>
+					</div>
 				</div>
-				<div id="modelStatus" class="status" aria-live="polite"></div>
-			</div>
+			</details>
 			<div class="section">
 				<h2>上下文与记忆</h2>
 				<div class="row">
@@ -75,9 +80,12 @@
 			<footer class="chat-input">
 				<label for="userInput">消息输入</label>
 				<textarea id="userInput" rows="3" placeholder="输入你的目标，例如：在 /project1 下创建两个 CHOP 并连接到 merge1"></textarea>
-				<div class="row">
-					<button id="sendBtn">发送</button>
-					<button id="execSuggestedBtn" class="secondary">执行AI建议命令</button>
+				<div class="row" style="display:flex; justify-content:space-between;">
+					<div class="row">
+						<button id="sendBtn">发送</button>
+						<button id="execSuggestedBtn" class="secondary">执行AI建议命令</button>
+					</div>
+					<button id="btnCopyDebugInfo" class="secondary" title="复制我的问题、AI生成的命令和执行结果到剪贴板">📋 复制调试信息</button>
 				</div>
 			</footer>
 		</main>

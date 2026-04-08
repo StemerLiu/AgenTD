@@ -1,5 +1,30 @@
-def build_edit_plan_brief(task_brief: dict, state_brief: dict, compatibility_brief: dict, data: dict, context: dict):
-	raw_changes = data.get('framework_changes', [])
+import os
+import json
+
+def build_edit_plan_brief(task_brief: dict, state_brief: dict, compatibility_brief: dict, data: dict, context: dict, retry_request: dict = None):
+	raw_changes = data.get('framework_changes')
+	if not raw_changes:
+		prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'system.txt')
+		with open(prompt_path, 'r', encoding='utf-8') as f:
+			system_prompt = f.read().strip()
+		
+		content_obj = {
+			"task_brief": task_brief,
+			"state_brief": state_brief,
+			"compatibility_brief": compatibility_brief
+		}
+		if retry_request:
+			content_obj["retry_request"] = retry_request
+			
+		user_content = json.dumps(content_obj, ensure_ascii=False, indent=2)
+		
+		try:
+			_, llm_data = context['call_agent_json'](system_prompt, user_content, data.get('config', {}), 90)
+			raw_changes = llm_data.get('framework_changes', []) if isinstance(llm_data, dict) else []
+		except Exception as e:
+			print(f"Agent-3 Error: {e}")
+			raw_changes = []
+
 	framework_changes = []
 	if isinstance(raw_changes, list):
 		for item in raw_changes:
@@ -78,7 +103,7 @@ def build_execution_result(task_brief: dict, edit_plan_brief: dict, data: dict, 
 
 
 def build_retry_edit_plan_brief(task_brief: dict, state_brief: dict, compatibility_brief: dict, retry_request: dict, data: dict, context: dict):
-	result = build_edit_plan_brief(task_brief, state_brief, compatibility_brief, data, context)
+	result = build_edit_plan_brief(task_brief, state_brief, compatibility_brief, data, context, retry_request)
 	risk_points = list(result.get('risk_points', []))
 	failure_summary = str(retry_request.get('failure_summary') or '').strip()
 	suggested_fix = str(retry_request.get('suggested_fix') or '').strip()

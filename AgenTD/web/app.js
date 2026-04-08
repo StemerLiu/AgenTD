@@ -11,11 +11,13 @@ const QUICK_COMMANDS = [
 	{ label: "replicate_framework", command: { cmd: "replicate_framework", file: "OP_Framework.json", clear_parent: true } }
 ];
 
-const WORKFLOW_NODE_ORDER = ["planner", "executor", "reviewer", "assistant"];
+const WORKFLOW_NODE_ORDER = ["orchestrator", "state_reader", "kb_consultant", "framework_editor", "verifier", "assistant"];
 const WORKFLOW_NODE_META = {
-	planner: { title: "Planner", hint: "任务拆解与计划生成" },
-	executor: { title: "Executor", hint: "执行命令生成与修复" },
-	reviewer: { title: "Reviewer", hint: "风险审计与建议" },
+	orchestrator: { title: "Orchestrator", hint: "任务调度与分析" },
+	state_reader: { title: "State Reader", hint: "读取 TD 现状" },
+	kb_consultant: { title: "KB Consultant", hint: "知识库校验" },
+	framework_editor: { title: "Framework Editor", hint: "生成连线与执行草案" },
+	verifier: { title: "Verifier", hint: "审计执行并控制回环" },
 	assistant: { title: "Assistant", hint: "最终回复汇总" }
 };
 
@@ -68,7 +70,8 @@ const el = {
 	workflowGraph: document.getElementById("workflowGraph"),
 	workflowTimeline: document.getElementById("workflowTimeline"),
 	workflowStatus: document.getElementById("workflowStatus"),
-	workflowMeta: document.getElementById("workflowMeta")
+	workflowMeta: document.getElementById("workflowMeta"),
+	btnCopyDebugInfo: document.getElementById("btnCopyDebugInfo")
 };
 
 function appendMessage(role, content) {
@@ -89,18 +92,25 @@ function appendMessage(role, content) {
 function loadConfig() {
 	const saved = localStorage.getItem("td_ai_console_config");
 	if (!saved) {
+		el.model.value = DEEPSEEK_CONFIG.model;
+		el.baseUrl.value = DEEPSEEK_CONFIG.baseUrl;
+		el.apiKey.value = "sk-3e6765a488f84d7b9fbbc828f15559bc";
+		el.temperature.value = 0.2;
+		el.tdHost.value = "127.0.0.1";
+		el.tdPort.value = "9988";
 		return;
 	}
 	try {
 		const cfg = JSON.parse(saved);
 		el.model.value = cfg.model || DEEPSEEK_CONFIG.model;
 		el.baseUrl.value = cfg.baseUrl || DEEPSEEK_CONFIG.baseUrl;
-		el.apiKey.value = cfg.apiKey || "";
+		el.apiKey.value = cfg.apiKey || "sk-3e6765a488f84d7b9fbbc828f15559bc";
 		el.temperature.value = cfg.temperature ?? 0.2;
 		el.tdHost.value = cfg.tdHost || "127.0.0.1";
 		el.tdPort.value = cfg.tdPort || 9988;
 	} catch (err) {
 		console.error(err);
+		el.apiKey.value = "sk-3e6765a488f84d7b9fbbc828f15559bc";
 	}
 }
 
@@ -287,32 +297,42 @@ function applyCollaboration(collaboration, replyText = "") {
 	if (!collaboration || typeof collaboration !== "object") {
 		return;
 	}
-	const planner = collaboration.planner || {};
-	const executor = collaboration.executor || {};
-	const reviewer = collaboration.reviewer || {};
-	updateWorkflowNode("planner", {
+	const task_brief = collaboration.outputs?.task_brief || {};
+	const edit_plan_brief = collaboration.outputs?.edit_plan_brief || {};
+	const validation_brief = collaboration.outputs?.validation_brief || {};
+	const compatibility_brief = collaboration.outputs?.compatibility_brief || {};
+
+	updateWorkflowNode("orchestrator", {
 		status: "done",
-		summary: planner.summary || "任务拆解完成",
+		summary: task_brief.summary || "任务调度完成",
 		metrics: [
-			`任务 ${Array.isArray(planner.tasks) ? planner.tasks.length : 0} 条`,
-			`假设 ${Array.isArray(planner.assumptions) ? planner.assumptions.length : 0} 条`
+			`任务分类: ${task_brief.task_type || "未知"}`
 		]
 	});
-	updateWorkflowNode("executor", {
+	updateWorkflowNode("state_reader", {
 		status: "done",
-		summary: executor.reply || "命令生成完成",
+		summary: "项目现状已读取",
+		metrics: []
+	});
+	updateWorkflowNode("kb_consultant", {
+		status: "done",
+		summary: compatibility_brief.compatibility_issues ? "发现兼容性问题" : "兼容性正常",
 		metrics: [
-			`命令 ${Array.isArray(executor.commands) ? executor.commands.length : 0} 条`,
-			`检查 ${Array.isArray(executor.checks) ? executor.checks.length : 0} 条`
+			`风险数: ${Array.isArray(compatibility_brief.compatibility_issues) ? compatibility_brief.compatibility_issues.length : 0}`
 		]
 	});
-	updateWorkflowNode("reviewer", {
-		status: reviewer.status === "partial" ? "partial" : "done",
-		summary: reviewer.assessment || "审计完成",
+	updateWorkflowNode("framework_editor", {
+		status: "done",
+		summary: "连线草案生成",
 		metrics: [
-			`风险 ${Array.isArray(reviewer.risks) ? reviewer.risks.length : 0} 条`,
-			`建议 ${Array.isArray(reviewer.suggestions) ? reviewer.suggestions.length : 0} 条`,
-			`性能 ${reviewer.performance === "provided" ? "已提供" : "未实现"}`
+			`改动: ${Array.isArray(edit_plan_brief.framework_changes) ? edit_plan_brief.framework_changes.length : 0} 处`
+		]
+	});
+	updateWorkflowNode("verifier", {
+		status: "done",
+		summary: validation_brief.validation_status === "approved" ? "审计通过" : "审计发现问题",
+		metrics: [
+			`重试次数: ${collaboration.outputs?.auto_retry_count || 0}`
 		]
 	});
 	updateWorkflowNode("assistant", {
@@ -322,7 +342,7 @@ function applyCollaboration(collaboration, replyText = "") {
 			`回复 ${String(replyText || "").length} 字符`
 		]
 	});
-	setWorkflowStatus("多智能体协作已完成", `Planner / Executor / Reviewer / Assistant`);
+	setWorkflowStatus("多智能体协作已完成", `Orchestrator / State Reader / KB Consultant / Framework Editor / Verifier`);
 }
 
 function applyChatResult(result, aiBubble, aiReplyRef) {
@@ -335,6 +355,12 @@ function applyChatResult(result, aiBubble, aiReplyRef) {
 	if (!aiReplyRef && reply) {
 		aiReplyRef = reply;
 		aiBubble.textContent = aiReplyRef;
+	} else if (!aiReplyRef) {
+		const assistantOutputs = result.collaboration?.outputs?.final_report || {};
+		if (assistantOutputs.summary) {
+			aiReplyRef = assistantOutputs.summary;
+			aiBubble.textContent = aiReplyRef;
+		}
 	}
 	const nextCommands = Array.isArray(result.commands) ? result.commands : [];
 	renderSuggestedCommands(nextCommands, { autoOpen: nextCommands.length > 0, suffix: "最终结果" });
@@ -399,73 +425,84 @@ async function sendChat() {
 		let buffer = "";
 		while (true) {
 			const { value, done } = await reader.read();
-			if (done) {
-				break;
+			if (value) {
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split("\n");
+				buffer = lines.pop() || "";
+				for (const line of lines) {
+					const textLine = line.trim();
+					if (!textLine) {
+						continue;
+					}
+					let packet = null;
+					try {
+						packet = JSON.parse(textLine);
+					} catch (err) {
+						continue;
+					}
+					const event = packet.event;
+					const data = packet.data || {};
+					if (event === "start") {
+						appendMessage("agent", data.message || "开始处理");
+						setWorkflowStatus(data.message || "已开始处理请求", "DeepSeek 正在驱动多智能体协作");
+						pushWorkflowEvent(data.message || "开始处理请求");
+						continue;
+					}
+					if (event === "stage") {
+						appendMessage("agent", data.message || `${data.stage || "agent"}: ${data.status || "running"}`);
+						const stage = String(data.stage || "");
+						if (WORKFLOW_NODE_ORDER.includes(stage)) {
+							const metrics = [];
+							if (typeof data.taskCount === "number") {
+								metrics.push(`任务 ${data.taskCount} 条`);
+							}
+							if (typeof data.commandCount === "number") {
+								metrics.push(`命令 ${data.commandCount} 条`);
+							}
+							if (data.performance) {
+								metrics.push(`性能 ${data.performance === "provided" ? "已提供" : "未实现"}`);
+							}
+							updateWorkflowNode(stage, {
+								status: data.status === "running" || data.status === "streaming" ? "running" : "done",
+								summary: data.summary || data.message || "",
+								metrics
+							});
+							setWorkflowStatus(`当前阶段：${WORKFLOW_NODE_META[stage].title}`, data.message || "");
+							pushWorkflowEvent(`${WORKFLOW_NODE_META[stage].title} · ${data.message || data.status || "处理中"}`);
+						}
+						if (data.stage === "framework_editor" && data.status === "done" && Array.isArray(data.commands)) {
+							renderSuggestedCommands(data.commands, { autoOpen: true, suffix: "Framework Editor阶段" });
+						}
+						continue;
+					}
+					if (event === "reply_delta") {
+						aiReply += String(data.delta || "");
+						aiBubble.textContent = aiReply;
+						el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+						continue;
+					}
+					if (event === "done") {
+						lastDonePayload = data;
+						continue;
+					}
+					if (event === "error") {
+						setWorkflowStatus("协作失败", data.message || "流式调用失败");
+						pushWorkflowEvent(`失败：${data.message || "流式调用失败"}`);
+						throw new Error(data.message || "流式调用失败");
+					}
+				}
 			}
-			buffer += decoder.decode(value, { stream: true });
-			const lines = buffer.split("\n");
-			buffer = lines.pop() || "";
-			for (const line of lines) {
-				const textLine = line.trim();
-				if (!textLine) {
-					continue;
-				}
-				let packet = null;
-				try {
-					packet = JSON.parse(textLine);
-				} catch (err) {
-					continue;
-				}
-				const event = packet.event;
-				const data = packet.data || {};
-				if (event === "start") {
-					appendMessage("agent", data.message || "开始处理");
-					setWorkflowStatus(data.message || "已开始处理请求", "DeepSeek 正在驱动多智能体协作");
-					pushWorkflowEvent(data.message || "开始处理请求");
-					continue;
-				}
-				if (event === "stage") {
-					appendMessage("agent", data.message || `${data.stage || "agent"}: ${data.status || "running"}`);
-					const stage = String(data.stage || "");
-					if (WORKFLOW_NODE_ORDER.includes(stage)) {
-						const metrics = [];
-						if (typeof data.taskCount === "number") {
-							metrics.push(`任务 ${data.taskCount} 条`);
-						}
-						if (typeof data.commandCount === "number") {
-							metrics.push(`命令 ${data.commandCount} 条`);
-						}
-						if (data.performance) {
-							metrics.push(`性能 ${data.performance === "provided" ? "已提供" : "未实现"}`);
-						}
-						updateWorkflowNode(stage, {
-							status: data.status === "running" || data.status === "streaming" ? "running" : "done",
-							summary: data.summary || data.message || "",
-							metrics
-						});
-						setWorkflowStatus(`当前阶段：${WORKFLOW_NODE_META[stage].title}`, data.message || "");
-						pushWorkflowEvent(`${WORKFLOW_NODE_META[stage].title} · ${data.message || data.status || "处理中"}`);
+			if (done) {
+				buffer += decoder.decode();
+				if (buffer.trim()) {
+					try {
+						const packet = JSON.parse(buffer.trim());
+						if (packet.event === "done") lastDonePayload = packet.data;
+					} catch(e) {
+						console.error("JSON parse error on final buffer:", e, buffer.substring(0, 200));
 					}
-					if (data.stage === "executor" && data.status === "done" && Array.isArray(data.commands)) {
-						renderSuggestedCommands(data.commands, { autoOpen: true, suffix: "Executor阶段" });
-					}
-					continue;
 				}
-				if (event === "reply_delta") {
-					aiReply += String(data.delta || "");
-					aiBubble.textContent = aiReply;
-					el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
-					continue;
-				}
-				if (event === "done") {
-					lastDonePayload = data;
-					continue;
-				}
-				if (event === "error") {
-					setWorkflowStatus("协作失败", data.message || "流式调用失败");
-					pushWorkflowEvent(`失败：${data.message || "流式调用失败"}`);
-					throw new Error(data.message || "流式调用失败");
-				}
+				break;
 			}
 		}
 		if (lastDonePayload && typeof lastDonePayload === "object") {
@@ -574,6 +611,7 @@ function bindEvents() {
 	document.getElementById("btnReload").addEventListener("click", () => sendSingleCommand({ cmd: "reload" }));
 	document.getElementById("btnDiagnostics").addEventListener("click", refreshProjectSummary);
 	document.getElementById("btnRefreshSummary").addEventListener("click", refreshProjectSummary);
+	document.getElementById("btnCopyDebugInfo").addEventListener("click", copyDebugInfo);
 	el.userInput.addEventListener("keydown", (event) => {
 		if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
 			sendChat();
@@ -591,7 +629,37 @@ function bootstrap() {
 	appendMessage("ai", "已就绪：你可以直接描述目标，我会生成并可执行 TD JSON 命令。");
 }
 
-bootstrap();
+function copyDebugInfo() {
+	const lastUserMsg = state.messages.slice().reverse().find(m => m.role === 'user');
+	const userQuestion = lastUserMsg ? lastUserMsg.content : '暂无最近提问';
+	
+	const generatedCommands = state.suggestedCommands && state.suggestedCommands.length > 0 
+		? JSON.stringify(state.suggestedCommands, null, 2) 
+		: '暂无生成的命令';
+		
+	let executionResult = '尚未执行命令';
+	if (state.recentHistory && state.recentHistory.length > 0) {
+		const latestHistory = state.recentHistory[state.recentHistory.length - 1];
+		if (JSON.stringify(latestHistory.commands) === JSON.stringify(state.suggestedCommands)) {
+			executionResult = JSON.stringify(latestHistory.result, null, 2);
+		}
+	}
+	
+	const debugText = `=== 提问的问题 ===\n${userQuestion}\n\n=== AI生成的方案(Commands) ===\n${generatedCommands}\n\n=== 最终的运行结果 ===\n${executionResult}`;
+	
+	navigator.clipboard.writeText(debugText).then(() => {
+		const originalText = el.btnCopyDebugInfo.textContent;
+		el.btnCopyDebugInfo.textContent = "✅ 已复制";
+		setTimeout(() => {
+			el.btnCopyDebugInfo.textContent = originalText;
+		}, 2000);
+	}).catch(err => {
+		console.error("复制失败:", err);
+		alert("复制失败，请重试");
+	});
+}
+
+document.addEventListener("DOMContentLoaded", bootstrap);
 
 async function refreshProjectSummary() {
 	const cfg = getConfig();

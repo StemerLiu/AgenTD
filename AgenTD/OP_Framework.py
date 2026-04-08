@@ -20,13 +20,7 @@ def log_target_network_full(target_dat_name='OP_Framework'):
 
 	def get_export_path():
 		default_name = f'{target_dat_name}.json'
-		try:
-			folder = str(project.folder)
-		except:
-			folder = ''
-		if folder:
-			return os.path.join(folder, default_name)
-		return default_name
+		return os.path.join(project.folder, 'AgenTD', default_name)
 
 	def to_rel_path(path_str):
 		base = target_comp.path

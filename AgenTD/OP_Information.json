@@ -1,1 +1,487 @@
-[]
+[
+	{
+		"add1": {
+			"relPath": "/project1/add1",
+			"type": "addTOP",
+			"pos": {
+				"x": 25,
+				"y": 25
+			},
+			"parameters": {
+				"Common": {
+					"aspect1": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"aspect2": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"chanmask": {
+						"val": "15",
+						"mode": "ParMode.CONSTANT"
+					},
+					"fillmode": {
+						"val": "best",
+						"mode": "ParMode.CONSTANT"
+					},
+					"filtertype": {
+						"val": "linear",
+						"mode": "ParMode.CONSTANT"
+					},
+					"format": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"inputfiltertype": {
+						"val": "linear",
+						"mode": "ParMode.CONSTANT"
+					},
+					"npasses": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					},
+					"outputaspect": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"outputresolution": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resmult": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionh": {
+						"val": "256",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionw": {
+						"val": "256",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"Transform": {
+					"extend": {
+						"val": "zero",
+						"mode": "ParMode.CONSTANT"
+					},
+					"justifyh": {
+						"val": "center",
+						"mode": "ParMode.CONSTANT"
+					},
+					"justifyv": {
+						"val": "center",
+						"mode": "ParMode.CONSTANT"
+					},
+					"legacyxform": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					},
+					"prefit": {
+						"val": "fill",
+						"mode": "ParMode.CONSTANT"
+					},
+					"punit": {
+						"val": "fraction",
+						"mode": "ParMode.CONSTANT"
+					},
+					"px": {
+						"val": "0.5",
+						"mode": "ParMode.CONSTANT"
+					},
+					"py": {
+						"val": "0.5",
+						"mode": "ParMode.CONSTANT"
+					},
+					"r": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"size": {
+						"val": "input2",
+						"mode": "ParMode.CONSTANT"
+					},
+					"sx": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"sy": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"tunit": {
+						"val": "fraction",
+						"mode": "ParMode.CONSTANT"
+					},
+					"tx": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ty": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					}
+				}
+			},
+			"drawState": {
+				"display": false
+			},
+			"connections": {
+				"outputs": [
+					{
+						"port": 0,
+						"links": [
+							"ssao1"
+						]
+					}
+				]
+			}
+		}
+	},
+	{
+		"ssao1": {
+			"relPath": "/project1/ssao1",
+			"type": "ssaoTOP",
+			"pos": {
+				"x": 250,
+				"y": 25
+			},
+			"parameters": {
+				"Common": {
+					"aspect1": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"aspect2": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"chanmask": {
+						"val": "15",
+						"mode": "ParMode.CONSTANT"
+					},
+					"fillmode": {
+						"val": "best",
+						"mode": "ParMode.CONSTANT"
+					},
+					"filtertype": {
+						"val": "linear",
+						"mode": "ParMode.CONSTANT"
+					},
+					"format": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"inputfiltertype": {
+						"val": "linear",
+						"mode": "ParMode.CONSTANT"
+					},
+					"npasses": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					},
+					"outputaspect": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"outputresolution": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resmult": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionh": {
+						"val": "256",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionw": {
+						"val": "256",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"SSAO": {
+					"attenuation": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"blurradius": {
+						"val": "8.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"blursharpness": {
+						"val": "10.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"cameraindex": {
+						"val": "0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"combinewithcolor": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"contrast": {
+						"val": "1.25",
+						"mode": "ParMode.CONSTANT"
+					},
+					"edgethresh": {
+						"val": "0.10000000149011612",
+						"mode": "ParMode.CONSTANT"
+					},
+					"quality": {
+						"val": "medium",
+						"mode": "ParMode.CONSTANT"
+					},
+					"sampledirs": {
+						"val": "8",
+						"mode": "ParMode.CONSTANT"
+					},
+					"samplesteps": {
+						"val": "16",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ssaopassres": {
+						"val": "half",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ssaoradius": {
+						"val": "0.20000000298023224",
+						"mode": "ParMode.CONSTANT"
+					},
+					"surfaceavoid": {
+						"val": "30.0",
+						"mode": "ParMode.CONSTANT"
+					}
+				}
+			},
+			"drawState": {
+				"display": false
+			},
+			"connections": {
+				"inputs": [
+					{
+						"port": 0,
+						"links": [
+							"add1"
+						]
+					}
+				]
+			}
+		}
+	},
+	{
+		"temp_state_marker": {
+			"relPath": "/project1/temp_state_marker",
+			"type": "noiseTOP",
+			"pos": {
+				"x": 0,
+				"y": 0
+			},
+			"parameters": {
+				"Common": {
+					"aspect1": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"aspect2": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"chanmask": {
+						"val": "15",
+						"mode": "ParMode.CONSTANT"
+					},
+					"fillmode": {
+						"val": "best",
+						"mode": "ParMode.CONSTANT"
+					},
+					"filtertype": {
+						"val": "linear",
+						"mode": "ParMode.CONSTANT"
+					},
+					"format": {
+						"val": "useinput",
+						"mode": "ParMode.CONSTANT"
+					},
+					"inputfiltertype": {
+						"val": "linear",
+						"mode": "ParMode.CONSTANT"
+					},
+					"npasses": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					},
+					"outputaspect": {
+						"val": "resolution",
+						"mode": "ParMode.CONSTANT"
+					},
+					"outputresolution": {
+						"val": "custom",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resmult": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionh": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionw": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"Noise": {
+					"amp": {
+						"val": "0.5",
+						"mode": "ParMode.CONSTANT"
+					},
+					"aspectcorrect": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"exp": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"gain": {
+						"val": "0.7",
+						"mode": "ParMode.CONSTANT"
+					},
+					"harmon": {
+						"val": "2",
+						"mode": "ParMode.CONSTANT"
+					},
+					"mono": {
+						"val": "True",
+						"mode": "ParMode.CONSTANT"
+					},
+					"offset": {
+						"val": "0.5",
+						"mode": "ParMode.CONSTANT"
+					},
+					"period": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"rough": {
+						"val": "0.5",
+						"mode": "ParMode.CONSTANT"
+					},
+					"seed": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"spread": {
+						"val": "2.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"type": {
+						"val": "simplex3d",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"Output": {
+					"alpha": {
+						"val": "one",
+						"mode": "ParMode.CONSTANT"
+					},
+					"derivative": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					},
+					"dither": {
+						"val": "False",
+						"mode": "ParMode.CONSTANT"
+					},
+					"inputscale": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"noisescale": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"rgb": {
+						"val": "add",
+						"mode": "ParMode.CONSTANT"
+					}
+				},
+				"Transform": {
+					"px": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"py": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"pz": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"rord": {
+						"val": "xyz",
+						"mode": "ParMode.CONSTANT"
+					},
+					"rx": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ry": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"rz": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"s4d": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"sx": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"sy": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"sz": {
+						"val": "1.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"t4d": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"tx": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"ty": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"tz": {
+						"val": "0.0",
+						"mode": "ParMode.CONSTANT"
+					},
+					"xord": {
+						"val": "srt",
+						"mode": "ParMode.CONSTANT"
+					}
+				}
+			},
+			"drawState": {
+				"display": false
+			}
+		}
+	}
+]

@@ -408,7 +408,15 @@
 						"properties": {
 							"path": {"type": "string"},
 							"type": {"type": "string"},
-							"action": {"type": "string"}
+							"action": {"type": "string"},
+							"parameters": {
+								"type": "object",
+								"additionalProperties": true
+							},
+							"connections": {
+								"type": "object",
+								"additionalProperties": true
+							}
 						},
 						"required": ["path", "type", "action"],
 						"additionalProperties": false

@@ -1,1 +1,79 @@
-[]
+[
+	{
+		"add1": {
+			"relPath": "/project1/add1",
+			"type": "addTOP",
+			"pos": {
+				"x": 25,
+				"y": 25
+			},
+			"parameters": {},
+			"drawState": {
+				"display": false
+			},
+			"connections": {
+				"outputs": [
+					{
+						"port": 0,
+						"links": [
+							"ssao1"
+						]
+					}
+				]
+			}
+		}
+	},
+	{
+		"ssao1": {
+			"relPath": "/project1/ssao1",
+			"type": "ssaoTOP",
+			"pos": {
+				"x": 250,
+				"y": 25
+			},
+			"parameters": {},
+			"drawState": {
+				"display": false
+			},
+			"connections": {
+				"inputs": [
+					{
+						"port": 0,
+						"links": [
+							"add1"
+						]
+					}
+				]
+			}
+		}
+	},
+	{
+		"temp_state_marker": {
+			"relPath": "/project1/temp_state_marker",
+			"type": "noiseTOP",
+			"pos": {
+				"x": 0,
+				"y": 0
+			},
+			"parameters": {
+				"Common": {
+					"outputresolution": {
+						"val": "custom",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionh": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					},
+					"resolutionw": {
+						"val": "1",
+						"mode": "ParMode.CONSTANT"
+					}
+				}
+			},
+			"drawState": {
+				"display": false
+			}
+		}
+	}
+]
